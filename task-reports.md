@@ -160,3 +160,23 @@
 Состояние запуска:
 - README покрывает базовые dev-команды для локальной работы со стеком;
 - проект остаётся запускаемым после задачи
+
+## T9 — Создать Django app для доменной логики
+- Дата: 2026-03-08 23:41 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- создано Django-приложение [`backend/ideas/`](/home/vr/projects/idea-lab/backend/ideas) для будущей доменной логики идей, источников и API;
+- приложение подключено в [`backend/config/settings.py`](/home/vr/projects/idea-lab/backend/config/settings.py) через `ideas.apps.IdeasConfig`;
+- добавлен минимальный smoke-тест в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py), который подтверждает регистрацию app в Django.
+
+Проверка:
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose logs web --tail 40` — passed (backend перезагрузился после подключения app без ошибок)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- backend импортирует новое приложение `ideas` без ошибок;
+- проект остаётся запускаемым после задачи
