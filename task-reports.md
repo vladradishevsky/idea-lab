@@ -94,3 +94,23 @@
 Состояние запуска:
 - `docker compose up` поднимает реальный frontend вместо заглушки;
 - проект остаётся запускаемым после задачи
+
+## T6 — Сделать стартовую frontend-страницу и прокинуть env
+- Дата: 2026-03-08 23:18 +0300
+- Статус: done
+- Коммит: `0bf9702`
+
+Что сделано:
+- обновлён [`docker-compose.yml`](/home/vr/projects/idea-lab/docker-compose.yml): для сервиса `frontend` добавлена переменная окружения `VITE_API_BASE_URL=http://localhost:8000`;
+- доработана стартовая страница в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx): теперь она показывает явный статус готовности frontend и выводит базовый URL backend API из env;
+- обновлены стили в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css), чтобы статусные блоки были читаемыми на стартовом экране.
+
+Проверка:
+- `docker compose up --build -d` — passed
+- `docker compose logs frontend --tail 40` — passed (`VITE v5.4.14 ready`, dev server слушает `http://localhost:5173/`)
+- Playwright smoke-check `http://127.0.0.1:5173/` — passed (страница показывает `Frontend is ready for development` и `http://localhost:8000`)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- стартовая frontend-страница открывается на `localhost:5173` и показывает ожидаемый статус;
+- проект остаётся запускаемым после задачи
