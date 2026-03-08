@@ -301,3 +301,21 @@
 Состояние запуска:
 - backend стартует с подключённым DRF и базовым `/api/` роутингом;
 - проект остаётся запускаемым после задачи
+
+## T16 — Реализовать serializer для ingestion одного объекта
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- добавлен serializer [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) для ingestion одного объекта на базе модели `Stage`;
+- в serializer явно зафиксированы обязательные поля `source_system`, `source_id`, `source_url`, `title` и опциональные `description`, `category`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены тесты на успешную валидацию корректного payload и на ошибку при отсутствии обязательных полей.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from ideas.serializers import StageIngestionSerializer; ..."` — passed
+
+Состояние запуска:
+- backend стартует с готовым ingestion serializer для следующего API endpoint;
+- проект остаётся запускаемым после задачи

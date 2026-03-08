@@ -4,6 +4,7 @@ from django.apps import apps
 from django.test import SimpleTestCase, TestCase
 
 from ideas.models import SourceSystem, Stage, StageStatus
+from ideas.serializers import StageIngestionSerializer
 
 
 class IdeasAppConfigTests(SimpleTestCase):
@@ -101,3 +102,43 @@ class StageModelTests(TestCase):
 
         self.assertIn("seo_kd_percent", error.exception.message_dict)
         self.assertIn("implementation_ease_percent", error.exception.message_dict)
+
+
+class StageIngestionSerializerTests(TestCase):
+    def test_serializer_accepts_valid_ingestion_payload(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork",
+            base_url="https://kwork.ru",
+        )
+        payload = {
+            "source_system": source_system.pk,
+            "source_id": "project-999",
+            "source_url": "https://kwork.ru/projects/999",
+            "title": "Launch a SaaS MVP",
+            "description": "Need a product team for a quick launch",
+            "category": "development",
+        }
+
+        serializer = StageIngestionSerializer(data=payload)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["source_system"], source_system)
+        self.assertEqual(serializer.validated_data["source_id"], payload["source_id"])
+        self.assertEqual(serializer.validated_data["source_url"], payload["source_url"])
+        self.assertEqual(serializer.validated_data["title"], payload["title"])
+        self.assertEqual(serializer.validated_data["description"], payload["description"])
+        self.assertEqual(serializer.validated_data["category"], payload["category"])
+
+    def test_serializer_requires_mandatory_ingestion_fields(self) -> None:
+        serializer = StageIngestionSerializer(
+            data={
+                "description": "Payload without required fields",
+                "category": "development",
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            set(serializer.errors.keys()),
+            {"source_system", "source_id", "source_url", "title"},
+        )
