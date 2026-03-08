@@ -180,3 +180,24 @@
 Состояние запуска:
 - backend импортирует новое приложение `ideas` без ошибок;
 - проект остаётся запускаемым после задачи
+
+## T10 — Реализовать модель `SourceSystem`
+- Дата: 2026-03-08 23:45 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) добавлена модель `SourceSystem` с полями `name`, `base_url`, `is_active`, `created_at`, `updated_at`;
+- добавлена миграция [`backend/ideas/migrations/0001_initial.py`](/home/vr/projects/idea-lab/backend/ideas/migrations/0001_initial.py) для создания таблицы `ideas_sourcesystem`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен backend-тест на создание и чтение записи `SourceSystem` через ORM.
+
+Проверка:
+- `docker compose exec -T web python manage.py migrate` — passed
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T db psql -U idea_lab -d idea_lab -c "\\d ideas_sourcesystem"` — passed (таблица создана в PostgreSQL)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- backend стартует с применённой миграцией `ideas.0001_initial`;
+- проект остаётся запускаемым после задачи
