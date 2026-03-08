@@ -184,7 +184,7 @@
 ## T10 — Реализовать модель `SourceSystem`
 - Дата: 2026-03-08 23:45 +0300
 - Статус: done
-- Коммит: `pending`
+- Коммит: `6f693f6`
 
 Что сделано:
 - в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) добавлена модель `SourceSystem` с полями `name`, `base_url`, `is_active`, `created_at`, `updated_at`;
