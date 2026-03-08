@@ -373,3 +373,21 @@
 Состояние запуска:
 - backend принимает идеи по одной и пачкой, корректно суммируя `created` и `ignored`;
 - проект остаётся запускаемым после задачи
+
+## T20 — Добавить логирование ingest-операций
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлено логирование ingest-операций через logger `ideas.ingest` для успешной обработки и ошибок валидации;
+- в [`backend/config/settings.py`](/home/vr/projects/idea-lab/backend/config/settings.py) добавлена базовая logging-конфигурация с выводом `ideas.ingest` в консоль контейнера;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены тесты, которые проверяют логирование результатов `created/ignored` и логирование ошибок валидации.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- ingest-операции логируются в dev-режиме с результатами обработки и ошибками валидации;
+- проект остаётся запускаемым после задачи

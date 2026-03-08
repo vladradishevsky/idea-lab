@@ -1,8 +1,13 @@
-from rest_framework import status
+import logging
+
+from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ideas.serializers import StageIngestionSerializer
+
+
+logger = logging.getLogger("ideas.ingest")
 
 
 class StageIngestionView(APIView):
@@ -13,7 +18,17 @@ class StageIngestionView(APIView):
         is_many = isinstance(request.data, list)
         payload = request.data if is_many else [request.data]
         serializer = StageIngestionSerializer(data=payload, many=True)
-        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except exceptions.ValidationError:
+            logger.warning(
+                "ingest validation_failed items=%s errors=%s",
+                len(payload),
+                serializer.errors,
+            )
+            raise
+
         created_count = 0
         ignored_count = 0
 
@@ -29,6 +44,13 @@ class StageIngestionView(APIView):
 
             StageIngestionSerializer.Meta.model.objects.create(**item)
             created_count += 1
+
+        logger.info(
+            "ingest completed items=%s created=%s ignored=%s",
+            len(payload),
+            created_count,
+            ignored_count,
+        )
 
         return Response(
             {

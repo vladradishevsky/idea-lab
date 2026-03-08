@@ -288,3 +288,57 @@ class StageIngestionApiTests(TestCase):
 
         self.assertEqual(duplicate_stage.source_url, "https://kwork.ru/projects/existing")
         self.assertEqual(duplicate_stage.title, "Existing project")
+
+    def test_post_ingestion_endpoint_logs_created_and_ignored_counts(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Logging API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-log-duplicate",
+            source_url="https://kwork.ru/projects/existing-log",
+            title="Existing log project",
+        )
+        payload = [
+            {
+                "source_system": source_system.pk,
+                "source_id": "project-log-1",
+                "source_url": "https://kwork.ru/projects/project-log-1",
+                "title": "Log project 1",
+            },
+            {
+                "source_system": source_system.pk,
+                "source_id": "project-log-duplicate",
+                "source_url": "https://kwork.ru/projects/ignored-log",
+                "title": "Ignored log project",
+            },
+        ]
+
+        with self.assertLogs("ideas.ingest", level="INFO") as captured_logs:
+            response = self.client.post(
+                reverse("api:ingest"),
+                data=payload,
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(
+            "ingest completed items=2 created=1 ignored=1",
+            captured_logs.output[0],
+        )
+
+    def test_post_ingestion_endpoint_logs_validation_errors(self) -> None:
+        with self.assertLogs("ideas.ingest", level="WARNING") as captured_logs:
+            response = self.client.post(
+                reverse("api:ingest"),
+                data=[{"description": "missing required fields"}],
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ingest validation_failed items=1", captured_logs.output[0])
+        self.assertIn("source_system", captured_logs.output[0])
+        self.assertIn("source_id", captured_logs.output[0])
+        self.assertIn("source_url", captured_logs.output[0])
+        self.assertIn("title", captured_logs.output[0])
