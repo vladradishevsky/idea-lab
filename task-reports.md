@@ -248,7 +248,7 @@
 ## T13 — Подключить модели в Django Admin
 - Дата: 2026-03-09 00:01 +0300
 - Статус: done
-- Коммит: `pending`
+- Коммит: `b56a2df`
 
 Что сделано:
 - в [`backend/ideas/admin.py`](/home/vr/projects/idea-lab/backend/ideas/admin.py) зарегистрированы `SourceSystem` и `Stage` через `ModelAdmin`;
