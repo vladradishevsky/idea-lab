@@ -280,3 +280,24 @@
 Состояние запуска:
 - backend стартует с предзаполненным справочником источников;
 - проект остаётся запускаемым после задачи
+
+## T15 — Подключить DRF и базовую конфигурацию API
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`backend/requirements.txt`](/home/vr/projects/idea-lab/backend/requirements.txt) добавлен `djangorestframework`, а в [`backend/config/settings.py`](/home/vr/projects/idea-lab/backend/config/settings.py) подключён `rest_framework` и базовые renderer classes;
+- базовый API-роутинг вынесен в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py) и подключён через `/api/` в [`backend/config/urls.py`](/home/vr/projects/idea-lab/backend/config/urls.py);
+- в [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) добавлены DRF views для API root и health endpoint, а в [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) — smoke-тесты на `/api/` и `/api/health/`.
+
+Проверка:
+- `docker compose build web` — passed
+- `docker compose up -d web` — passed
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- backend стартует с подключённым DRF и базовым `/api/` роутингом;
+- проект остаётся запускаемым после задачи
