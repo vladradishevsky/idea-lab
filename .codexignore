@@ -1,0 +1,64 @@
+# Keep Codex context focused on source and config, not generated artifacts.
+
+# VCS / tooling metadata
+.git/
+.idea/
+.vscode/
+
+# Python environments and caches
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python packaging / build
+build/
+dist/
+site/
+.eggs/
+*.egg
+*.egg-info/
+pip-wheel-metadata/
+
+# Local secrets / env files
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+*.pid
+*.pid.lock
+*.out
+*.err
+
+# Frontend / Node artifacts (future use)
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+coverage/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Data / notebooks
+.ipynb_checkpoints/
+
