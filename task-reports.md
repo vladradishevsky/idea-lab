@@ -377,7 +377,7 @@
 ## T20 — Добавить логирование ingest-операций
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `dd489cc`
 
 Что сделано:
 - в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлено логирование ingest-операций через logger `ideas.ingest` для успешной обработки и ошибок валидации;
