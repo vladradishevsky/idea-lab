@@ -395,7 +395,7 @@
 ## T21 — Реализовать endpoint списка идей с пагинацией
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `0700333`
 
 Что сделано:
 - добавлен endpoint `/api/stages/` в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) на базе `ListAPIView` с серверной пагинацией;
