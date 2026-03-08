@@ -205,7 +205,7 @@
 ## T11 — Реализовать enum статусов и модель `Stage` без сложной логики
 - Дата: 2026-03-08 23:50 +0300
 - Статус: done
-- Коммит: `pending`
+- Коммит: `328a02d`
 
 Что сделано:
 - в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) добавлен enum `StageStatus` и модель `Stage` со всеми полями из PRD;
