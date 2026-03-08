@@ -323,7 +323,7 @@
 ## T17 — Реализовать ingestion endpoint для одного объекта
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `553f660`
 
 Что сделано:
 - добавлен POST endpoint `/api/ingest/` в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py), который валидирует payload через `StageIngestionSerializer` и создаёт одну запись `Stage`;
