@@ -284,7 +284,7 @@
 ## T15 — Подключить DRF и базовую конфигурацию API
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `195a9b1`
 
 Что сделано:
 - в [`backend/requirements.txt`](/home/vr/projects/idea-lab/backend/requirements.txt) добавлен `djangorestframework`, а в [`backend/config/settings.py`](/home/vr/projects/idea-lab/backend/config/settings.py) подключён `rest_framework` и базовые renderer classes;
