@@ -305,7 +305,7 @@
 ## T16 — Реализовать serializer для ingestion одного объекта
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `b13db82`
 
 Что сделано:
 - добавлен serializer [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) для ingestion одного объекта на базе модели `Stage`;
