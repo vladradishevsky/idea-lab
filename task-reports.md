@@ -73,3 +73,24 @@
 Состояние запуска:
 - `docker compose up` продолжает поднимать проект без деградации;
 - backend доступен с отдельным health endpoint для последующих задач
+
+## T5 — Инициализировать React-приложение
+- Дата: 2026-03-08 23:11 +0300
+- Статус: done
+- Коммит: `eb69d79`
+
+Что сделано:
+- обновлён [`frontend/Dockerfile`](/home/vr/projects/idea-lab/frontend/Dockerfile): контейнер `frontend` теперь собирается на `node:22-alpine`, устанавливает зависимости и запускает Vite dev server;
+- добавлен минимальный React + Vite scaffold: [`frontend/package.json`](/home/vr/projects/idea-lab/frontend/package.json), [`frontend/vite.config.js`](/home/vr/projects/idea-lab/frontend/vite.config.js), [`frontend/index.html`](/home/vr/projects/idea-lab/frontend/index.html), [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx), [`frontend/src/main.jsx`](/home/vr/projects/idea-lab/frontend/src/main.jsx), [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css);
+- обновлён [`docker-compose.yml`](/home/vr/projects/idea-lab/docker-compose.yml): сервис `frontend` публикует порт `5173`, запускает `npm run dev` и использует отдельный volume `frontend_node_modules`, чтобы bind mount не затирал установленные зависимости;
+- обновлён lockfile [`frontend/package-lock.json`](/home/vr/projects/idea-lab/frontend/package-lock.json) для воспроизводимой установки зависимостей.
+
+Проверка:
+- `docker compose up --build -d` — passed
+- `docker compose logs frontend --tail 40` — passed (`VITE v5.4.14 ready`, dev server слушает `http://localhost:5173/`)
+- `docker compose exec -T frontend wget -q -O - http://127.0.0.1:5173` — passed (возвращается HTML стартовой страницы)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- `docker compose up` поднимает реальный frontend вместо заглушки;
+- проект остаётся запускаемым после задачи
