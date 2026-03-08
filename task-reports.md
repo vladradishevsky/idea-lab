@@ -138,3 +138,25 @@
 Состояние запуска:
 - `docker compose up` поднимает стек с backend на PostgreSQL вместо SQLite;
 - проект остаётся запускаемым после задачи
+
+## T8 — Настроить базовые команды разработки
+- Дата: 2026-03-08 23:31 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- обновлён [`README.md`](/home/vr/projects/idea-lab/README.md): добавлены требования к окружению, быстрый старт, адреса сервисов, учётные данные admin и базовые команды разработки;
+- в README описаны команды для запуска, остановки, пересборки, просмотра статуса контейнеров, логов и backend-тестов;
+- проверено, что сценарий из README позволяет заново остановить и поднять проект локально.
+
+Проверка:
+- `docker compose down` — passed
+- `docker compose up --build -d` — passed
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+- `docker compose logs web --tail 40` — passed (backend стартовал без ошибок)
+- `docker compose logs frontend --tail 20` — passed (Vite dev server поднялся на `http://localhost:5173/`)
+- `docker compose exec -T web python manage.py test` — passed
+
+Состояние запуска:
+- README покрывает базовые dev-команды для локальной работы со стеком;
+- проект остаётся запускаемым после задачи
