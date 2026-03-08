@@ -181,7 +181,47 @@ class StageIngestionApiTests(TestCase):
         self.assertEqual(
             response.json(),
             {
-                "id": stage.pk,
-                "status": StageStatus.NEW,
+                "created": 1,
+                "ignored": 0,
             },
         )
+
+    def test_post_ingestion_endpoint_ignores_duplicate_without_updating_stage(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Duplicate API",
+            base_url="https://kwork.ru",
+        )
+        original_stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-duplicate-1",
+            source_url="https://kwork.ru/projects/original",
+            title="Original title",
+            description="Original description",
+            category="original-category",
+        )
+        payload = {
+            "source_system": source_system.pk,
+            "source_id": original_stage.source_id,
+            "source_url": "https://kwork.ru/projects/updated",
+            "title": "Updated title",
+            "description": "Updated description",
+            "category": "updated-category",
+        }
+
+        response = self.client.post(
+            reverse("api:ingest"),
+            data=payload,
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"created": 0, "ignored": 1})
+        self.assertEqual(Stage.objects.count(), 1)
+
+        original_stage.refresh_from_db()
+
+        self.assertEqual(original_stage.source_url, "https://kwork.ru/projects/original")
+        self.assertEqual(original_stage.title, "Original title")
+        self.assertEqual(original_stage.description, "Original description")
+        self.assertEqual(original_stage.category, "original-category")
+        self.assertEqual(original_stage.status, StageStatus.NEW)

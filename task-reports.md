@@ -337,3 +337,21 @@
 Состояние запуска:
 - backend умеет принимать одну идею через ingestion API;
 - проект остаётся запускаемым после задачи
+
+## T18 — Добавить дедупликацию ingestion
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлена дедупликация ingestion по паре `source_system + source_id` перед созданием записи;
+- endpoint `/api/ingest/` теперь возвращает счётчики `created` и `ignored`, чтобы контракт был готов к следующему расширению на batch ingestion;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен тест, который подтверждает игнорирование дубликата и отсутствие обновления существующей записи.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- backend принимает одну идею и игнорирует дубликаты без обновления существующей записи;
+- проект остаётся запускаемым после задачи

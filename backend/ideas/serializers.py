@@ -6,6 +6,7 @@ from ideas.models import Stage
 class StageIngestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stage
+        validators = []
         fields = [
             "source_system",
             "source_id",
