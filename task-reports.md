@@ -27,8 +27,9 @@
 
 Проверка:
 - `docker compose config` — passed
-- `docker compose up --build -d` — blocked: текущая среда не имеет доступа к `unix:///var/run/docker.sock`
+- `docker compose up --build -d` — passed
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
 
 Состояние запуска:
-- compose-конфигурация собрана и валидируется локально;
-- полноценный smoke-check запуска контейнеров требует прав на Docker daemon на хосте
+- `docker compose up` поднимает минимальный стек из трёх сервисов без падения;
+- проект остаётся запускаемым после задачи
