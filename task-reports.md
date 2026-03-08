@@ -319,3 +319,21 @@
 Состояние запуска:
 - backend стартует с готовым ingestion serializer для следующего API endpoint;
 - проект остаётся запускаемым после задачи
+
+## T17 — Реализовать ingestion endpoint для одного объекта
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- добавлен POST endpoint `/api/ingest/` в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py), который валидирует payload через `StageIngestionSerializer` и создаёт одну запись `Stage`;
+- endpoint подключён в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py), а [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) обновлён так, чтобы API root показывал ссылку на ingestion endpoint;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен backend-тест, который проверяет успешное создание записи через API и дефолтный статус `new`.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- backend умеет принимать одну идею через ingestion API;
+- проект остаётся запускаемым после задачи

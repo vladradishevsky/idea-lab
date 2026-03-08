@@ -7,7 +7,13 @@ class ApiRootTests(SimpleTestCase):
         response = self.client.get(reverse("api:root"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"health": "http://testserver/api/health/"})
+        self.assertEqual(
+            response.json(),
+            {
+                "health": "http://testserver/api/health/",
+                "ingest": "http://testserver/api/ingest/",
+            },
+        )
 
 
 class HealthCheckTests(SimpleTestCase):

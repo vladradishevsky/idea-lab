@@ -1,7 +1,8 @@
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.apps import apps
+from django.db import IntegrityError
 from django.test import SimpleTestCase, TestCase
+from django.urls import reverse
 
 from ideas.models import SourceSystem, Stage, StageStatus
 from ideas.serializers import StageIngestionSerializer
@@ -141,4 +142,46 @@ class StageIngestionSerializerTests(TestCase):
         self.assertEqual(
             set(serializer.errors.keys()),
             {"source_system", "source_id", "source_url", "title"},
+        )
+
+
+class StageIngestionApiTests(TestCase):
+    def test_post_ingestion_endpoint_creates_stage_with_new_status(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork API",
+            base_url="https://kwork.ru",
+        )
+        payload = {
+            "source_system": source_system.pk,
+            "source_id": "project-api-1",
+            "source_url": "https://kwork.ru/projects/project-api-1",
+            "title": "API ingestion test",
+            "description": "Created via ingestion endpoint",
+            "category": "development",
+        }
+
+        response = self.client.post(
+            reverse("api:ingest"),
+            data=payload,
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Stage.objects.count(), 1)
+
+        stage = Stage.objects.get()
+
+        self.assertEqual(stage.source_system, source_system)
+        self.assertEqual(stage.source_id, payload["source_id"])
+        self.assertEqual(stage.source_url, payload["source_url"])
+        self.assertEqual(stage.title, payload["title"])
+        self.assertEqual(stage.description, payload["description"])
+        self.assertEqual(stage.category, payload["category"])
+        self.assertEqual(stage.status, StageStatus.NEW)
+        self.assertEqual(
+            response.json(),
+            {
+                "id": stage.pk,
+                "status": StageStatus.NEW,
+            },
         )

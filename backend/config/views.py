@@ -5,7 +5,12 @@ from rest_framework.views import APIView
 
 class ApiRootView(APIView):
     def get(self, request):
-        return Response({"health": reverse("api:health-check", request=request)})
+        return Response(
+            {
+                "health": reverse("api:health-check", request=request),
+                "ingest": reverse("api:ingest", request=request),
+            }
+        )
 
 
 class HealthCheckView(APIView):
