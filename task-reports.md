@@ -17,7 +17,7 @@
 ## T2 — Поднять минимальный `docker-compose`
 - Дата: 2026-03-08 22:39 +0300
 - Статус: done
-- Коммит: `pending`
+- Коммит: `a46fe11`
 
 Что сделано:
 - добавлен [`docker-compose.yml`](/home/vr/projects/idea-lab/docker-compose.yml) с сервисами `db`, `web`, `frontend`;
