@@ -37,6 +37,8 @@ services:
     build:
       context: /home/vr/projects/idea-lab/frontend
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:5173 >/dev/null"]
       interval: 10s
