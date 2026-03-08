@@ -224,9 +224,9 @@
 - проект остаётся запускаемым после задачи
 
 ## T12 — Добавить ограничения и индексы для `Stage`
-- Дата: 2026-03-08 23:53 +0300
+- Дата: 2026-03-09 23:53 +0300
 - Статус: done
-- Коммит: `pending`
+- Коммит: `ac3ecf0`
 
 Что сделано:
 - в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) для `Stage` добавлены `UniqueConstraint` по паре (`source_system`, `source_id`), `CheckConstraint` для диапазона `0..100` и индексы по `status`, `created_at`, `is_filled`, (`status`, `created_at`);
