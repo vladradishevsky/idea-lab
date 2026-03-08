@@ -18,15 +18,18 @@ services:
   web:
     build:
       context: /home/vr/projects/idea-lab/backend
-    command: ["sh", "-c", "while true; do sleep 3600; done"]
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "ps -o comm= 1 | grep -q sleep"]
+      test: ["CMD", "python", "manage.py", "check"]
       interval: 10s
       timeout: 5s
       retries: 5
+    entrypoint: ["/entrypoint.sh"]
+    ports:
+      - "8000:8000"
     volumes:
       - /home/vr/projects/idea-lab/backend:/app
 
