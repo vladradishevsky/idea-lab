@@ -244,3 +244,23 @@
 Состояние запуска:
 - backend стартует с применённой миграцией `ideas.0003_stage_constraints`;
 - проект остаётся запускаемым после задачи
+
+## T13 — Подключить модели в Django Admin
+- Дата: 2026-03-09 00:01 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- в [`backend/ideas/admin.py`](/home/vr/projects/idea-lab/backend/ideas/admin.py) зарегистрированы `SourceSystem` и `Stage` через `ModelAdmin`;
+- для `SourceSystem` настроены `list_display`, `list_filter`, `search_fields` и сортировка;
+- для `Stage` настроены `list_display`, фильтры по служебным полям, поиск по ключевым полям, `autocomplete_fields` для источника и `list_select_related`.
+
+Проверка:
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.contrib import admin; ..."` — passed (`SourceSystem` и `Stage` зарегистрированы в admin site)
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed (`/admin/` отвечает `200` и показывает `Source systems`, `Stages`)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- модели `SourceSystem` и `Stage` доступны в Django admin для служебной работы;
+- проект остаётся запускаемым после задачи
