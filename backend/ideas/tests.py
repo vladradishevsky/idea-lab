@@ -225,3 +225,66 @@ class StageIngestionApiTests(TestCase):
         self.assertEqual(original_stage.description, "Original description")
         self.assertEqual(original_stage.category, "original-category")
         self.assertEqual(original_stage.status, StageStatus.NEW)
+
+    def test_post_ingestion_endpoint_accepts_batch_payload(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Batch API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-batch-duplicate",
+            source_url="https://kwork.ru/projects/existing",
+            title="Existing project",
+        )
+        payload = [
+            {
+                "source_system": source_system.pk,
+                "source_id": "project-batch-1",
+                "source_url": "https://kwork.ru/projects/project-batch-1",
+                "title": "Batch project 1",
+                "description": "First new record",
+                "category": "development",
+            },
+            {
+                "source_system": source_system.pk,
+                "source_id": "project-batch-duplicate",
+                "source_url": "https://kwork.ru/projects/should-be-ignored",
+                "title": "Duplicate project",
+            },
+            {
+                "source_system": source_system.pk,
+                "source_id": "project-batch-2",
+                "source_url": "https://kwork.ru/projects/project-batch-2",
+                "title": "Batch project 2",
+            },
+        ]
+
+        response = self.client.post(
+            reverse("api:ingest"),
+            data=payload,
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {"created": 2, "ignored": 1})
+        self.assertEqual(Stage.objects.count(), 3)
+        self.assertTrue(
+            Stage.objects.filter(
+                source_system=source_system,
+                source_id="project-batch-1",
+                status=StageStatus.NEW,
+            ).exists()
+        )
+        self.assertTrue(
+            Stage.objects.filter(
+                source_system=source_system,
+                source_id="project-batch-2",
+                status=StageStatus.NEW,
+            ).exists()
+        )
+
+        duplicate_stage = Stage.objects.get(source_id="project-batch-duplicate")
+
+        self.assertEqual(duplicate_stage.source_url, "https://kwork.ru/projects/existing")
+        self.assertEqual(duplicate_stage.title, "Existing project")

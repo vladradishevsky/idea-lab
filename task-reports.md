@@ -355,3 +355,21 @@
 Состояние запуска:
 - backend принимает одну идею и игнорирует дубликаты без обновления существующей записи;
 - проект остаётся запускаемым после задачи
+
+## T19 — Поддержать ingestion массива объектов
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) endpoint `/api/ingest/` расширен на приём как одного объекта, так и массива объектов;
+- batch ingestion использует общий serializer в режиме `many=True`, считает суммарные `created` и `ignored` и сохраняет только уникальные записи;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен тест на batch payload со смесью новых и дублирующихся записей.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- backend принимает идеи по одной и пачкой, корректно суммируя `created` и `ignored`;
+- проект остаётся запускаемым после задачи

@@ -10,29 +10,30 @@ class StageIngestionView(APIView):
     permission_classes = []
 
     def post(self, request):
-        serializer = StageIngestionSerializer(data=request.data)
+        is_many = isinstance(request.data, list)
+        payload = request.data if is_many else [request.data]
+        serializer = StageIngestionSerializer(data=payload, many=True)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-        stage = StageIngestionSerializer.Meta.model.objects.filter(
-            source_system=validated_data["source_system"],
-            source_id=validated_data["source_id"],
-        ).first()
+        created_count = 0
+        ignored_count = 0
 
-        if stage is not None:
-            return Response(
-                {
-                    "created": 0,
-                    "ignored": 1,
-                },
-                status=status.HTTP_200_OK,
-            )
+        for item in serializer.validated_data:
+            stage = StageIngestionSerializer.Meta.model.objects.filter(
+                source_system=item["source_system"],
+                source_id=item["source_id"],
+            ).first()
 
-        serializer.save()
+            if stage is not None:
+                ignored_count += 1
+                continue
+
+            StageIngestionSerializer.Meta.model.objects.create(**item)
+            created_count += 1
 
         return Response(
             {
-                "created": 1,
-                "ignored": 0,
+                "created": created_count,
+                "ignored": ignored_count,
             },
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_201_CREATED if created_count > 0 else status.HTTP_200_OK,
         )
