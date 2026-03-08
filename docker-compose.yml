@@ -22,6 +22,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      POSTGRES_DB: idea_lab
+      POSTGRES_USER: idea_lab
+      POSTGRES_PASSWORD: idea_lab
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
     healthcheck:
       test: ["CMD", "python", "manage.py", "check"]
       interval: 10s

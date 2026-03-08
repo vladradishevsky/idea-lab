@@ -114,3 +114,27 @@
 Состояние запуска:
 - стартовая frontend-страница открывается на `localhost:5173` и показывает ожидаемый статус;
 - проект остаётся запускаемым после задачи
+
+## T7 — Подключить PostgreSQL к Django
+- Дата: 2026-03-08 23:24 +0300
+- Статус: done
+- Коммит: `3c93ae7`
+
+Что сделано:
+- обновлён [`backend/config/settings.py`](/home/vr/projects/idea-lab/backend/config/settings.py): Django переведён с SQLite на PostgreSQL и читает параметры подключения из env;
+- обновлён [`docker-compose.yml`](/home/vr/projects/idea-lab/docker-compose.yml): сервис `web` теперь получает явные `POSTGRES_*` переменные для подключения к контейнеру `db`;
+- обновлён [`backend/requirements.txt`](/home/vr/projects/idea-lab/backend/requirements.txt): добавлен драйвер `psycopg[binary]` для работы Django с PostgreSQL;
+- проверено, что при старте контейнера `web` миграции применяются в БД `idea_lab` внутри PostgreSQL.
+
+Проверка:
+- `docker compose config` — passed
+- `docker compose up --build -d` — passed
+- `docker compose logs web --tail 60` — passed (миграции применены, `System check identified no issues`, dev server стартовал)
+- `docker compose exec -T web python manage.py shell -c "from django.conf import settings; from django.db import connection; ..."` — passed (`django.db.backends.postgresql`, host `db`, DB `idea_lab`)
+- `docker compose exec -T db psql -U idea_lab -d idea_lab -c "\\dt"` — passed (таблицы Django созданы в PostgreSQL)
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- `docker compose up` поднимает стек с backend на PostgreSQL вместо SQLite;
+- проект остаётся запускаемым после задачи
