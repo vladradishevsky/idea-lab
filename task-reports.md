@@ -341,7 +341,7 @@
 ## T18 — Добавить дедупликацию ingestion
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `ddd0250`
 
 Что сделано:
 - в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлена дедупликация ingestion по паре `source_system + source_id` перед созданием записи;
