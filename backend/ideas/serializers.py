@@ -23,3 +23,24 @@ class StageIngestionSerializer(serializers.ModelSerializer):
             "description": {"required": False, "allow_null": True, "allow_blank": True},
             "category": {"required": False, "allow_null": True, "allow_blank": True},
         }
+
+
+class StageListSerializer(serializers.ModelSerializer):
+    source_system_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Stage
+        fields = [
+            "id",
+            "source_system_id",
+            "source_id",
+            "source_url",
+            "title",
+            "description",
+            "category",
+            "status",
+            "is_filled",
+            "filled_at",
+            "created_at",
+            "updated_at",
+        ]

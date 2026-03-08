@@ -391,3 +391,21 @@
 Состояние запуска:
 - ingest-операции логируются в dev-режиме с результатами обработки и ошибками валидации;
 - проект остаётся запускаемым после задачи
+
+## T21 — Реализовать endpoint списка идей с пагинацией
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- добавлен endpoint `/api/stages/` в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) на базе `ListAPIView` с серверной пагинацией;
+- добавлен serializer [`StageListSerializer`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) для списка `Stage` и подключён маршрут в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py);
+- API root в [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) обновлён ссылкой на список, а в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены тесты на пагинацию и дефолтный порядок `created_at ASC`.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed
+
+Состояние запуска:
+- backend отдаёт пагинированный список идей с дефолтной сортировкой по времени создания;
+- проект остаётся запускаемым после задачи

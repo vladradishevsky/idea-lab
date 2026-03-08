@@ -9,6 +9,7 @@ class ApiRootView(APIView):
             {
                 "health": reverse("api:health-check", request=request),
                 "ingest": reverse("api:ingest", request=request),
+                "stages": reverse("api:stage-list", request=request),
             }
         )
 

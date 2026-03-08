@@ -3,6 +3,7 @@ from django.apps import apps
 from django.db import IntegrityError
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from ideas.models import SourceSystem, Stage, StageStatus
 from ideas.serializers import StageIngestionSerializer
@@ -342,3 +343,68 @@ class StageIngestionApiTests(TestCase):
         self.assertIn("source_id", captured_logs.output[0])
         self.assertIn("source_url", captured_logs.output[0])
         self.assertIn("title", captured_logs.output[0])
+
+
+class StageListApiTests(TestCase):
+    def test_stage_list_endpoint_returns_paginated_response(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork List API",
+            base_url="https://kwork.ru",
+        )
+
+        for index in range(21):
+            Stage.objects.create(
+                source_system=source_system,
+                source_id=f"project-list-{index}",
+                source_url=f"https://kwork.ru/projects/{index}",
+                title=f"Project {index}",
+            )
+
+        response = self.client.get(reverse("api:stage-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 21)
+        self.assertIsNotNone(response.json()["next"])
+        self.assertIsNone(response.json()["previous"])
+        self.assertEqual(len(response.json()["results"]), 20)
+
+    def test_stage_list_endpoint_orders_by_created_at_ascending(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Ordered List API",
+            base_url="https://kwork.ru",
+        )
+        newest_stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-order-newest",
+            source_url="https://kwork.ru/projects/newest",
+            title="Newest project",
+        )
+        oldest_stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-order-oldest",
+            source_url="https://kwork.ru/projects/oldest",
+            title="Oldest project",
+        )
+        middle_stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-order-middle",
+            source_url="https://kwork.ru/projects/middle",
+            title="Middle project",
+        )
+
+        now = timezone.now()
+        Stage.objects.filter(pk=oldest_stage.pk).update(created_at=now - timezone.timedelta(days=2))
+        Stage.objects.filter(pk=middle_stage.pk).update(created_at=now - timezone.timedelta(days=1))
+        Stage.objects.filter(pk=newest_stage.pk).update(created_at=now)
+
+        response = self.client.get(reverse("api:stage-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            [
+                "project-order-oldest",
+                "project-order-middle",
+                "project-order-newest",
+            ],
+        )

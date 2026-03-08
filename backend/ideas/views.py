@@ -1,13 +1,22 @@
 import logging
 
 from rest_framework import exceptions, status
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ideas.serializers import StageIngestionSerializer
+from ideas.models import Stage
+from ideas.serializers import StageIngestionSerializer, StageListSerializer
 
 
 logger = logging.getLogger("ideas.ingest")
+
+
+class StagePagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class StageIngestionView(APIView):
@@ -59,3 +68,11 @@ class StageIngestionView(APIView):
             },
             status=status.HTTP_201_CREATED if created_count > 0 else status.HTTP_200_OK,
         )
+
+
+class StageListView(ListAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = StageListSerializer
+    pagination_class = StagePagination
+    queryset = Stage.objects.select_related("source_system").order_by("created_at", "id")
