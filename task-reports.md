@@ -266,7 +266,7 @@
 ## T14 — Добавить начальные `source_system`
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `8c298a6`
 
 Что сделано:
 - добавлена миграция [`backend/ideas/migrations/0004_seed_source_systems.py`](/home/vr/projects/idea-lab/backend/ideas/migrations/0004_seed_source_systems.py) со стартовыми источниками из PRD: `Kwork`, `Freelance.ru`, `FL.ru`;
