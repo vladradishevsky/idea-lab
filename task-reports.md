@@ -222,3 +222,25 @@
 Состояние запуска:
 - backend стартует с применённой миграцией `ideas.0002_stage`;
 - проект остаётся запускаемым после задачи
+
+## T12 — Добавить ограничения и индексы для `Stage`
+- Дата: 2026-03-08 23:53 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) для `Stage` добавлены `UniqueConstraint` по паре (`source_system`, `source_id`), `CheckConstraint` для диапазона `0..100` и индексы по `status`, `created_at`, `is_filled`, (`status`, `created_at`);
+- добавлены валидаторы `MinValueValidator` и `MaxValueValidator` для полей `seo_kd_percent` и `implementation_ease_percent`;
+- создана миграция [`backend/ideas/migrations/0003_stage_constraints.py`](/home/vr/projects/idea-lab/backend/ideas/migrations/0003_stage_constraints.py);
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены тесты на уникальность `(source_system, source_id)` и на отклонение процентов вне диапазона.
+
+Проверка:
+- `docker compose exec -T web python manage.py migrate` — passed
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T db psql -U idea_lab -d idea_lab -c "\\d ideas_stage"` — passed (у таблицы есть уникальное ограничение, check constraints и индексы)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- backend стартует с применённой миграцией `ideas.0003_stage_constraints`;
+- проект остаётся запускаемым после задачи
