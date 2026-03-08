@@ -359,7 +359,7 @@
 ## T19 — Поддержать ingestion массива объектов
 - Дата: 2026-03-09 00:00 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `2a0f90e`
 
 Что сделано:
 - в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) endpoint `/api/ingest/` расширен на приём как одного объекта, так и массива объектов;
