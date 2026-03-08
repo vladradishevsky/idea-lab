@@ -54,3 +54,22 @@
 Состояние запуска:
 - `docker compose up` поднимает реальный Django backend вместо заглушки;
 - проект остаётся запускаемым после задачи
+
+## T4 — Добавить backend health endpoint
+- Дата: 2026-03-08 23:05 +0300
+- Статус: done
+- Коммит: `836ac37`
+
+Что сделано:
+- добавлен endpoint [`/api/health/`](/home/vr/projects/idea-lab/backend/config/urls.py), который возвращает JSON-ответ готовности приложения;
+- реализован view [`health_check`](/home/vr/projects/idea-lab/backend/config/views.py) с ответом `{"status": "ok"}`;
+- добавлен backend smoke-тест в [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) на статус `200` и ожидаемый JSON.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed (`200`, `{'status': 'ok'}`)
+- `docker compose ps` — passed (`web`, `db`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- `docker compose up` продолжает поднимать проект без деградации;
+- backend доступен с отдельным health endpoint для последующих задач
