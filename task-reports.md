@@ -201,3 +201,24 @@
 Состояние запуска:
 - backend стартует с применённой миграцией `ideas.0001_initial`;
 - проект остаётся запускаемым после задачи
+
+## T11 — Реализовать enum статусов и модель `Stage` без сложной логики
+- Дата: 2026-03-08 23:50 +0300
+- Статус: done
+- Коммит: `pending`
+
+Что сделано:
+- в [`backend/ideas/models.py`](/home/vr/projects/idea-lab/backend/ideas/models.py) добавлен enum `StageStatus` и модель `Stage` со всеми полями из PRD;
+- добавлена миграция [`backend/ideas/migrations/0002_stage.py`](/home/vr/projects/idea-lab/backend/ideas/migrations/0002_stage.py) для создания таблицы `ideas_stage`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен backend-тест, который проверяет создание `Stage` с дефолтным статусом `new`.
+
+Проверка:
+- `docker compose exec -T web python manage.py migrate` — passed
+- `docker compose exec -T web python manage.py check` — passed
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T db psql -U idea_lab -d idea_lab -c "\\d ideas_stage"` — passed (таблица создана в PostgreSQL)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- backend стартует с применённой миграцией `ideas.0002_stage`;
+- проект остаётся запускаемым после задачи
