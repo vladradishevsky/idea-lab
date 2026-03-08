@@ -29,6 +29,20 @@ class SourceSystemModelTests(TestCase):
         self.assertIsNotNone(loaded_source_system.created_at)
         self.assertIsNotNone(loaded_source_system.updated_at)
 
+    def test_initial_source_systems_are_seeded(self) -> None:
+        expected_sources = {
+            "Kwork": "https://kwork.ru/projects",
+            "Freelance.ru": "https://freelance.ru/project/search?q=&a=0&a=1&v=0&v=1&c=&c%5B%5D=116&c%5B%5D=724&c%5B%5D=4",
+            "FL.ru": "https://www.fl.ru/projects/category/programmirovanie//",
+        }
+
+        actual_sources = dict(
+            SourceSystem.objects.filter(name__in=expected_sources)
+            .values_list("name", "base_url")
+        )
+
+        self.assertEqual(actual_sources, expected_sources)
+
 
 class StageModelTests(TestCase):
     def test_stage_uses_new_status_by_default(self) -> None:

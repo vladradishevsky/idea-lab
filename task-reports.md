@@ -258,9 +258,25 @@
 Проверка:
 - `docker compose exec -T web python manage.py check` — passed
 - `docker compose exec -T web python manage.py shell -c "from django.contrib import admin; ..."` — passed (`SourceSystem` и `Stage` зарегистрированы в admin site)
-- `docker compose exec -T web python manage.py shell -c "from django.test import Client; ..."` — passed (`/admin/` отвечает `200` и показывает `Source systems`, `Stages`)
-- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
 
 Состояние запуска:
-- модели `SourceSystem` и `Stage` доступны в Django admin для служебной работы;
+- backend продолжает стартовать с подключёнными моделями в Django Admin;
+- проект остаётся запускаемым после задачи
+
+## T14 — Добавить начальные `source_system`
+- Дата: 2026-03-09 00:00 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- добавлена миграция [`backend/ideas/migrations/0004_seed_source_systems.py`](/home/vr/projects/idea-lab/backend/ideas/migrations/0004_seed_source_systems.py) со стартовыми источниками из PRD: `Kwork`, `Freelance.ru`, `FL.ru`;
+- миграция реализована через `RunPython` и использует `update_or_create`, чтобы при повторном применении поддерживать ожидаемые значения `base_url` и `is_active`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен тест, который проверяет наличие стартовых `source_system` после миграций.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "from ideas.models import SourceSystem; ..."` — passed
+
+Состояние запуска:
+- backend стартует с предзаполненным справочником источников;
 - проект остаётся запускаемым после задачи
