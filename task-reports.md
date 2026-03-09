@@ -590,7 +590,7 @@
 ## T31 — Настроить базовый API client на frontend
 - Дата: 2026-03-09 20:26 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `5abf8b5`
 
 Что сделано:
 - добавлен базовый frontend API layer в [`frontend/src/api/client.js`](/home/vr/projects/idea-lab/frontend/src/api/client.js) с общим `fetch`-wrapper, JSON-обработкой и единым `ApiError`;
