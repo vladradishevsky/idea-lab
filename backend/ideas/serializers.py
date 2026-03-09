@@ -98,3 +98,12 @@ class StageListFilterSerializer(serializers.Serializer):
             )
 
         return statuses
+
+
+class StageStatusUpdateSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(
+        choices=[
+            (StageStatus.ACCEPTED, "Accepted"),
+            (StageStatus.REJECTED, "Rejected"),
+        ]
+    )

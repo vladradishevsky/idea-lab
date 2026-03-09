@@ -12,6 +12,7 @@ from ideas.serializers import (
     StageIngestionSerializer,
     StageListFilterSerializer,
     StageListSerializer,
+    StageStatusUpdateSerializer,
 )
 
 
@@ -115,3 +116,26 @@ class StageDetailView(RetrieveAPIView):
     permission_classes = []
     serializer_class = StageDetailSerializer
     queryset = Stage.objects.select_related("source_system")
+
+
+class StageStatusUpdateView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request, pk):
+        serializer = StageStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        stage = Stage.objects.select_related("source_system").filter(pk=pk).first()
+        if stage is None:
+            raise exceptions.NotFound()
+
+        if stage.status != StageStatus.NEW:
+            raise exceptions.ValidationError(
+                {"status": ["Quick status update is only available for stages in 'new' status."]}
+            )
+
+        stage.status = serializer.validated_data["status"]
+        stage.save(update_fields=["status", "updated_at"])
+
+        return Response(StageDetailSerializer(stage).data, status=status.HTTP_200_OK)

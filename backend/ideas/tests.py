@@ -724,3 +724,88 @@ class StageDetailApiTests(TestCase):
                 "updated_at": stage.updated_at.isoformat().replace("+00:00", "Z"),
             },
         )
+
+
+class StageStatusUpdateApiTests(TestCase):
+    def test_stage_status_update_endpoint_accepts_new_stage(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Status Update API",
+            base_url="https://kwork.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-status-accepted",
+            source_url="https://kwork.ru/projects/status-accepted",
+            title="Accepted via quick filter",
+            status=StageStatus.NEW,
+        )
+
+        response = self.client.post(
+            reverse("api:stage-status-update", kwargs={"pk": stage.pk}),
+            data={"status": StageStatus.ACCEPTED},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertEqual(response.json()["id"], stage.pk)
+        self.assertEqual(response.json()["status"], StageStatus.ACCEPTED)
+
+    def test_stage_status_update_endpoint_rejects_new_stage(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="FL Status Update API",
+            base_url="https://fl.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-status-rejected",
+            source_url="https://fl.ru/projects/status-rejected",
+            title="Rejected via quick filter",
+            status=StageStatus.NEW,
+        )
+
+        response = self.client.post(
+            reverse("api:stage-status-update", kwargs={"pk": stage.pk}),
+            data={"status": StageStatus.REJECTED},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.status, StageStatus.REJECTED)
+        self.assertEqual(response.json()["status"], StageStatus.REJECTED)
+
+    def test_stage_status_update_endpoint_rejects_invalid_transition(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Invalid Transition API",
+            base_url="https://kwork.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-status-invalid",
+            source_url="https://kwork.ru/projects/status-invalid",
+            title="Invalid quick filter transition",
+            status=StageStatus.ACCEPTED,
+        )
+
+        response = self.client.post(
+            reverse("api:stage-status-update", kwargs={"pk": stage.pk}),
+            data={"status": StageStatus.REJECTED},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertEqual(
+            response.json(),
+            {
+                "status": [
+                    "Quick status update is only available for stages in 'new' status."
+                ]
+            },
+        )
