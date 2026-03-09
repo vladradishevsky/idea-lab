@@ -613,7 +613,7 @@
 ## T32 — Реализовать dashboard page
 - Дата: 2026-03-09 20:31 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `137882c`
 
 Что сделано:
 - в [`frontend/src/api/resources.js`](/home/vr/projects/idea-lab/frontend/src/api/resources.js) добавлен запрос `getDashboardAggregates` для чтения `/api/dashboard/aggregates/`;
