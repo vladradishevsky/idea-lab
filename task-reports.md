@@ -545,3 +545,24 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь умеет отдавать агрегаты для dashboard;
 - проект остаётся запускаемым после задачи
+
+## T29 — Настроить frontend routing
+- Дата: 2026-03-09 20:18 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`frontend/package.json`](/home/vr/projects/idea-lab/frontend/package.json) и lockfile добавлена зависимость `react-router-dom` для клиентского роутинга;
+- в [`frontend/src/main.jsx`](/home/vr/projects/idea-lab/frontend/src/main.jsx) приложение обёрнуто в `BrowserRouter`;
+- в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) настроены маршруты `/`, `/filter`, `/stages` и добавлены отдельные route-specific страницы-заглушки;
+- в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css) обновлены стили стартового экрана под новый routing shell и route placeholders.
+
+Проверка:
+- `docker compose exec -T frontend npm install react-router-dom@6.30.1` — passed
+- `docker compose logs frontend --tail 60` — passed (`react-router-dom` оптимизирован Vite, dev server продолжает работать)
+- Playwright smoke-check `http://127.0.0.1:5173/`, `http://127.0.0.1:5173/filter`, `http://127.0.0.1:5173/stages` — passed (каждый маршрут рендерит свой заголовок и текущий pathname)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- frontend продолжает подниматься в compose-окружении и теперь поддерживает базовые клиентские маршруты для dashboard, quick filter и elaboration;
+- проект остаётся запускаемым после задачи
