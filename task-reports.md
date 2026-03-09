@@ -609,3 +609,24 @@
 Состояние запуска:
 - frontend продолжает подниматься в compose-окружении и теперь имеет рабочий базовый API client с общей обработкой загрузки и ошибок;
 - проект остаётся запускаемым после задачи
+
+## T32 — Реализовать dashboard page
+- Дата: 2026-03-09 20:31 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`frontend/src/api/resources.js`](/home/vr/projects/idea-lab/frontend/src/api/resources.js) добавлен запрос `getDashboardAggregates` для чтения `/api/dashboard/aggregates/`;
+- в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) реализована реальная dashboard-страница на маршруте `/` с загрузкой агрегатов, KPI-блоками, воронкой по статусам и CTA-переходами в quick filter и elaboration;
+- dashboard использует общий request layer из `T31` и показывает состояния `loading` и `error` для агрегатов;
+- в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css) добавлены стили для dashboard hero, KPI-карточек, funnel-блоков и workflow entry points.
+
+Проверка:
+- `docker compose logs frontend --tail 80` — passed
+- Playwright smoke-check `http://127.0.0.1:5173/` — passed (dashboard рендерит CTA-ссылки на `/filter` и `/stages`, затем после загрузки показывает реальные агрегаты `new`, `accepted`, `rejected`, `in_progress`, `completed`)
+- Playwright mocked error-check `http://127.0.0.1:5173/` — passed (при ответе `503` от `/api/dashboard/aggregates/` dashboard показывает error state с сообщением `Aggregates unavailable`)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- frontend продолжает подниматься в compose-окружении и теперь имеет рабочую dashboard-страницу на реальных backend-агрегатах;
+- проект остаётся запускаемым после задачи

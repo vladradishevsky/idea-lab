@@ -120,6 +120,106 @@ body {
   margin: 0 auto;
 }
 
+.dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 20px;
+}
+
+.dashboard-copy,
+.dashboard-side {
+  display: grid;
+  gap: 18px;
+}
+
+.dashboard-copy {
+  padding: 40px;
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  border-radius: 28px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 255, 0.9)),
+    rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 24px 80px rgba(20, 33, 61, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.dashboard-side {
+  align-content: stretch;
+}
+
+.spotlight-card {
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 40px rgba(20, 33, 61, 0.08);
+}
+
+.spotlight-label {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7a5c00;
+}
+
+.spotlight-value,
+.spotlight-copy {
+  margin: 0;
+  color: #19324e;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.spotlight-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary-link,
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.primary-link {
+  color: #fffdf8;
+  background: linear-gradient(135deg, #16324f, #24638f);
+  box-shadow: 0 14px 28px rgba(22, 50, 79, 0.24);
+}
+
+.secondary-link {
+  color: #17304a;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(20, 33, 61, 0.10);
+}
+
+.primary-link:hover,
+.secondary-link:hover,
+.workflow-card:hover {
+  transform: translateY(-1px);
+}
+
 .hero-card {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
@@ -295,6 +395,110 @@ h1 {
   letter-spacing: -0.04em;
 }
 
+.metric-grid,
+.funnel-grid,
+.workflow-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.metric-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.metric-card,
+.funnel-card,
+.workflow-card {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(176, 191, 214, 0.45);
+  background: rgba(245, 248, 252, 0.88);
+}
+
+.metric-label,
+.funnel-label,
+.workflow-kicker {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6b7890;
+}
+
+.metric-value,
+.funnel-value {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.funnel-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.funnel-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.funnel-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  border-radius: 999px;
+}
+
+.status-accent-new::before {
+  background: #8b5cf6;
+}
+
+.status-accent-accepted::before {
+  background: #0f9d58;
+}
+
+.status-accent-progress::before {
+  background: #24638f;
+}
+
+.status-accent-completed::before {
+  background: #d97706;
+}
+
+.status-accent-rejected::before {
+  background: #d14343;
+}
+
+.workflow-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workflow-card {
+  display: grid;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 246, 252, 0.92)),
+    rgba(255, 255, 255, 0.88);
+  box-shadow: 0 12px 30px rgba(20, 33, 61, 0.08);
+}
+
+.workflow-title {
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.workflow-copy {
+  color: #4f5b72;
+  line-height: 1.6;
+}
+
 .data-list {
   display: grid;
   gap: 12px;
@@ -338,6 +542,17 @@ h1 {
 
   .hero-card {
     grid-template-columns: 1fr;
+    padding: 28px;
+  }
+
+  .dashboard-hero,
+  .metric-grid,
+  .funnel-grid,
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-copy {
     padding: 28px;
   }
 
