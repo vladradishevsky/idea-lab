@@ -468,3 +468,23 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь поддерживает quick filter action для смены статуса;
 - проект остаётся запускаемым после задачи
+
+## T25 — Реализовать обновление карточки проработки
+- Дата: 2026-03-09 19:55 +0300
+- Статус: done
+- Коммит: `ebdcbe1`
+
+Что сделано:
+- в [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) добавлен `StageElaborationUpdateSerializer` только для полей проработки;
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлен endpoint `PATCH /api/stages/<id>/elaboration/` для частичного обновления карточки;
+- endpoint явно отклоняет служебные и неразрешённые поля, чтобы контракт редактирования не смешивался со статусами, `is_filled` и source-данными;
+- в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py), [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) и [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) добавлен новый маршрут и обновлён API root;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены backend-тесты на успешное сохранение полей проработки и на отклонение служебных полей.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`PATCH /api/stages/<id>/elaboration/` вернул `200` для полей проработки и `400` для `status`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь поддерживает отдельный контракт обновления карточки проработки;
+- проект остаётся запускаемым после задачи
