@@ -507,3 +507,22 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь автоматически выставляет `in_progress` при начале проработки;
 - проект остаётся запускаемым после задачи
+
+## T27 — Добавить переход в `completed` и фиксацию `filled_at`
+- Дата: 2026-03-09 19:58 +0300
+- Статус: done
+- Коммит: `b1efe89`
+
+Что сделано:
+- в [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) `StageElaborationUpdateSerializer` расширен полем `is_filled`, чтобы завершение карточки происходило через тот же update endpoint;
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлена логика: при `is_filled=true` статус становится `completed`, а `filled_at` фиксируется текущей датой, если раньше не был установлен;
+- повторные обновления уже завершённой карточки сохраняют существующий `filled_at` и не перетирают его новой датой;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены backend-тесты на переход в `completed`, фиксацию `filled_at`, сохранение уже существующей даты завершения и запрет ручного обновления `filled_at`.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`PATCH /api/stages/<id>/elaboration/` вернул `200`, статус `completed` и дату в `filled_at`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь поддерживает полный переход в `completed` через ручную установку `is_filled=true`;
+- проект остаётся запускаемым после задачи
