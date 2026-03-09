@@ -428,3 +428,23 @@
 Состояние запуска:
 - backend продолжает отдавать пагинированный список идей и теперь поддерживает обязательные фильтры из PRD;
 - проект остаётся запускаемым после задачи
+
+## T23 — Реализовать endpoint получения одной идеи
+- Дата: 2026-03-09 19:46 +0300
+- Статус: done
+- Коммит: `c5205fb`
+
+Что сделано:
+- в [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) добавлен `StageDetailSerializer` с полным набором полей карточки идеи;
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлен `StageDetailView` на базе `RetrieveAPIView`;
+- в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py) подключён маршрут `/api/stages/<id>/`;
+- в [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) API root дополнен ссылкой на detail endpoint;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен backend-тест на получение полной карточки по `id`, а в [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) обновлён контракт API root.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`GET /api/stages/<id>/` вернул `200`, корректный `id`, `custom_title` и `status`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь умеет отдавать полную карточку одной идеи;
+- проект остаётся запускаемым после задачи
