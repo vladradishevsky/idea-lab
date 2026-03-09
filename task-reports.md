@@ -586,3 +586,26 @@
 Состояние запуска:
 - frontend продолжает подниматься в compose-окружении и теперь имеет общий layout и рабочую навигацию между тремя основными разделами;
 - проект остаётся запускаемым после задачи
+
+## T31 — Настроить базовый API client на frontend
+- Дата: 2026-03-09 20:26 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- добавлен базовый frontend API layer в [`frontend/src/api/client.js`](/home/vr/projects/idea-lab/frontend/src/api/client.js) с общим `fetch`-wrapper, JSON-обработкой и единым `ApiError`;
+- добавлены endpoint-функции в [`frontend/src/api/resources.js`](/home/vr/projects/idea-lab/frontend/src/api/resources.js) и общий async hook в [`frontend/src/hooks/useApiRequest.js`](/home/vr/projects/idea-lab/frontend/src/hooks/useApiRequest.js);
+- в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) добавлен общий `RequestSummary` со стандартными состояниями `loading/error/success`, подключённый к реальным backend endpoint'ам;
+- в [`frontend/vite.config.js`](/home/vr/projects/idea-lab/frontend/vite.config.js) настроен dev proxy для `/api`, а в [`docker-compose.yml`](/home/vr/projects/idea-lab/docker-compose.yml) frontend переведён на same-origin схему без прямого cross-origin доступа к backend;
+- в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css) добавлены общие UI-стили для блока асинхронного состояния, списка данных и error/loading-состояний.
+
+Проверка:
+- `docker compose up -d frontend` — passed
+- `docker compose exec -T frontend wget -q -O - http://127.0.0.1:5173/api/health/` — passed (`{"status":"ok"}` через Vite proxy)
+- Playwright smoke-check `http://127.0.0.1:5173/` — passed (dashboard route показывает успешный ответ API root через общий request layer)
+- Playwright mocked error-check `http://127.0.0.1:5173/filter` — passed (при ответе `500` от `/api/health/` UI показывает общий error state и сообщение `Simulated failure`)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- frontend продолжает подниматься в compose-окружении и теперь имеет рабочий базовый API client с общей обработкой загрузки и ошибок;
+- проект остаётся запускаемым после задачи
