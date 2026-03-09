@@ -634,7 +634,7 @@
 ## T33 — Реализовать frontend-запрос на получение следующей идеи для фильтрации
 - Дата: 2026-03-09 20:41 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `964fe68`
 
 Что сделано:
 - в [`frontend/src/api/resources.js`](/home/vr/projects/idea-lab/frontend/src/api/resources.js) добавлены `getStages` и `getNextQuickFilterStage` для выборки списка идей и первой карточки для quick filter;
