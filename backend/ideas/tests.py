@@ -809,3 +809,84 @@ class StageStatusUpdateApiTests(TestCase):
                 ]
             },
         )
+
+
+class StageElaborationUpdateApiTests(TestCase):
+    def test_stage_elaboration_update_endpoint_saves_elaboration_fields(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Elaboration API",
+            base_url="https://kwork.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-1",
+            source_url="https://kwork.ru/projects/elaboration-1",
+            title="Elaboration target",
+            status=StageStatus.ACCEPTED,
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={
+                "custom_title": "Validated niche title",
+                "custom_description": "Expanded market summary",
+                "seo_query": "b2b lead scoring tool",
+                "seo_kd_percent": 34,
+                "planned_feature": "Landing page generator",
+                "implementation_ease_percent": 71,
+                "risks": "Demand may be narrow",
+            },
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.custom_title, "Validated niche title")
+        self.assertEqual(stage.custom_description, "Expanded market summary")
+        self.assertEqual(stage.seo_query, "b2b lead scoring tool")
+        self.assertEqual(stage.seo_kd_percent, 34)
+        self.assertEqual(stage.planned_feature, "Landing page generator")
+        self.assertEqual(stage.implementation_ease_percent, 71)
+        self.assertEqual(stage.risks, "Demand may be narrow")
+        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertFalse(stage.is_filled)
+        self.assertEqual(response.json()["custom_title"], "Validated niche title")
+        self.assertEqual(response.json()["status"], StageStatus.ACCEPTED)
+
+    def test_stage_elaboration_update_endpoint_rejects_service_fields(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="FL Elaboration API",
+            base_url="https://fl.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-2",
+            source_url="https://fl.ru/projects/elaboration-2",
+            title="Elaboration invalid payload target",
+            status=StageStatus.ACCEPTED,
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={
+                "custom_title": "Legit update",
+                "status": StageStatus.COMPLETED,
+                "is_filled": True,
+            },
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNone(stage.custom_title)
+        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertFalse(stage.is_filled)
+        self.assertEqual(
+            response.json(),
+            {
+                "status": ["This field is not allowed."],
+                "is_filled": ["This field is not allowed."],
+            },
+        )

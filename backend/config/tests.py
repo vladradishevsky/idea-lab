@@ -14,6 +14,7 @@ class ApiRootTests(SimpleTestCase):
                 "ingest": "http://testserver/api/ingest/",
                 "stages": "http://testserver/api/stages/",
                 "stage_detail": "http://testserver/api/stages/1/",
+                "stage_elaboration_update": "http://testserver/api/stages/1/elaboration/",
                 "stage_status_update": "http://testserver/api/stages/1/status/",
             },
         )

@@ -107,3 +107,20 @@ class StageStatusUpdateSerializer(serializers.Serializer):
             (StageStatus.REJECTED, "Rejected"),
         ]
     )
+
+
+class StageElaborationUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stage
+        fields = [
+            "custom_title",
+            "custom_description",
+            "existing_solution",
+            "original_revenue_estimate",
+            "seo_query",
+            "seo_kd_percent",
+            "seo_popularity_vs_adblocker",
+            "planned_feature",
+            "implementation_ease_percent",
+            "risks",
+        ]

@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 from ideas.models import Stage, StageStatus
 from ideas.serializers import (
+    StageElaborationUpdateSerializer,
     StageDetailSerializer,
     StageIngestionSerializer,
     StageListFilterSerializer,
@@ -137,5 +138,33 @@ class StageStatusUpdateView(APIView):
 
         stage.status = serializer.validated_data["status"]
         stage.save(update_fields=["status", "updated_at"])
+
+        return Response(StageDetailSerializer(stage).data, status=status.HTTP_200_OK)
+
+
+class StageElaborationUpdateView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def patch(self, request, pk):
+        stage = Stage.objects.select_related("source_system").filter(pk=pk).first()
+        if stage is None:
+            raise exceptions.NotFound()
+
+        allowed_fields = set(StageElaborationUpdateSerializer.Meta.fields)
+        unexpected_fields = sorted(set(request.data.keys()) - allowed_fields)
+        if unexpected_fields:
+            raise exceptions.ValidationError(
+                {field: ["This field is not allowed."] for field in unexpected_fields}
+            )
+
+        serializer = StageElaborationUpdateSerializer(
+            stage,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        stage.refresh_from_db()
 
         return Response(StageDetailSerializer(stage).data, status=status.HTTP_200_OK)

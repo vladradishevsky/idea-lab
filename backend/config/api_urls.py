@@ -2,6 +2,7 @@ from django.urls import path
 
 from config.views import ApiRootView, HealthCheckView
 from ideas.views import (
+    StageElaborationUpdateView,
     StageDetailView,
     StageIngestionView,
     StageListView,
@@ -18,5 +19,10 @@ urlpatterns = [
     path("ingest/", StageIngestionView.as_view(), name="ingest"),
     path("stages/", StageListView.as_view(), name="stage-list"),
     path("stages/<int:pk>/", StageDetailView.as_view(), name="stage-detail"),
+    path(
+        "stages/<int:pk>/elaboration/",
+        StageElaborationUpdateView.as_view(),
+        name="stage-elaboration-update",
+    ),
     path("stages/<int:pk>/status/", StageStatusUpdateView.as_view(), name="stage-status-update"),
 ]

@@ -11,6 +11,9 @@ class ApiRootView(APIView):
                 "ingest": reverse("api:ingest", request=request),
                 "stages": reverse("api:stage-list", request=request),
                 "stage_detail": reverse("api:stage-detail", kwargs={"pk": 1}, request=request),
+                "stage_elaboration_update": reverse(
+                    "api:stage-elaboration-update", kwargs={"pk": 1}, request=request
+                ),
                 "stage_status_update": reverse(
                     "api:stage-status-update", kwargs={"pk": 1}, request=request
                 ),
