@@ -488,3 +488,22 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь поддерживает отдельный контракт обновления карточки проработки;
 - проект остаётся запускаемым после задачи
+
+## T26 — Добавить автопереход в `in_progress`
+- Дата: 2026-03-09 19:56 +0300
+- Статус: done
+- Коммит: `40a72e2`
+
+Что сделано:
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлена логика автоперехода в `in_progress` после `PATCH /api/stages/<id>/elaboration/`;
+- если у карточки `is_filled=false` и после сохранения заполнено хотя бы одно поле проработки, статус автоматически меняется на `in_progress`;
+- логика не затрагивает уже заполненные карточки с `is_filled=true`, чтобы не смешивать `T26` с будущей задачей `T27`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) обновлены и добавлены backend-тесты на переход `accepted -> in_progress`, `new -> in_progress` и на отсутствие автоперехода при `is_filled=true`.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`PATCH /api/stages/<id>/elaboration/` вернул `200` и статус `in_progress`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь автоматически выставляет `in_progress` при начале проработки;
+- проект остаётся запускаемым после задачи
