@@ -408,3 +408,257 @@ class StageListApiTests(TestCase):
                 "project-order-newest",
             ],
         )
+
+    def test_stage_list_endpoint_hides_rejected_by_default(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Hidden Rejected API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-visible",
+            source_url="https://kwork.ru/projects/visible",
+            title="Visible project",
+            status=StageStatus.NEW,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-rejected",
+            source_url="https://kwork.ru/projects/rejected",
+            title="Rejected project",
+            status=StageStatus.REJECTED,
+        )
+
+        response = self.client.get(reverse("api:stage-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-visible"],
+        )
+
+    def test_stage_list_endpoint_filters_by_status(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Status Filter API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-accepted",
+            source_url="https://kwork.ru/projects/accepted",
+            title="Accepted project",
+            status=StageStatus.ACCEPTED,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-rejected",
+            source_url="https://kwork.ru/projects/rejected",
+            title="Rejected project",
+            status=StageStatus.REJECTED,
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={"status": StageStatus.REJECTED},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-rejected"],
+        )
+
+    def test_stage_list_endpoint_filters_by_source_system_id(self) -> None:
+        source_system_one = SourceSystem.objects.create(
+            name="Kwork Source Filter API",
+            base_url="https://kwork.ru",
+        )
+        source_system_two = SourceSystem.objects.create(
+            name="FL Source Filter API",
+            base_url="https://fl.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system_one,
+            source_id="project-source-1",
+            source_url="https://kwork.ru/projects/source-1",
+            title="Source project 1",
+        )
+        Stage.objects.create(
+            source_system=source_system_two,
+            source_id="project-source-2",
+            source_url="https://fl.ru/projects/source-2",
+            title="Source project 2",
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={"source_system_id": source_system_two.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-source-2"],
+        )
+
+    def test_stage_list_endpoint_filters_by_category(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Category Filter API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-category-dev",
+            source_url="https://kwork.ru/projects/category-dev",
+            title="Development project",
+            category="development",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-category-design",
+            source_url="https://kwork.ru/projects/category-design",
+            title="Design project",
+            category="design",
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={"category": "design"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-category-design"],
+        )
+
+    def test_stage_list_endpoint_filters_by_is_filled(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Filled Filter API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-filled-false",
+            source_url="https://kwork.ru/projects/filled-false",
+            title="Not filled project",
+            is_filled=False,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-filled-true",
+            source_url="https://kwork.ru/projects/filled-true",
+            title="Filled project",
+            is_filled=True,
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={"is_filled": "true"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-filled-true"],
+        )
+
+    def test_stage_list_endpoint_includes_rejected_when_requested(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Include Rejected API",
+            base_url="https://kwork.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-new",
+            source_url="https://kwork.ru/projects/new",
+            title="New project",
+            status=StageStatus.NEW,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="project-rejected",
+            source_url="https://kwork.ru/projects/rejected",
+            title="Rejected project",
+            status=StageStatus.REJECTED,
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={"include_rejected": "true"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 2)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-new", "project-rejected"],
+        )
+
+    def test_stage_list_endpoint_combines_filters(self) -> None:
+        source_system_one = SourceSystem.objects.create(
+            name="Kwork Combined Filter API",
+            base_url="https://kwork.ru",
+        )
+        source_system_two = SourceSystem.objects.create(
+            name="FL Combined Filter API",
+            base_url="https://fl.ru",
+        )
+        Stage.objects.create(
+            source_system=source_system_one,
+            source_id="project-combined-match",
+            source_url="https://kwork.ru/projects/combined-match",
+            title="Matching project",
+            category="development",
+            status=StageStatus.ACCEPTED,
+            is_filled=True,
+        )
+        Stage.objects.create(
+            source_system=source_system_one,
+            source_id="project-combined-wrong-category",
+            source_url="https://kwork.ru/projects/combined-wrong-category",
+            title="Wrong category project",
+            category="design",
+            status=StageStatus.ACCEPTED,
+            is_filled=True,
+        )
+        Stage.objects.create(
+            source_system=source_system_two,
+            source_id="project-combined-wrong-source",
+            source_url="https://fl.ru/projects/combined-wrong-source",
+            title="Wrong source project",
+            category="development",
+            status=StageStatus.ACCEPTED,
+            is_filled=True,
+        )
+        Stage.objects.create(
+            source_system=source_system_one,
+            source_id="project-combined-wrong-filled",
+            source_url="https://kwork.ru/projects/combined-wrong-filled",
+            title="Wrong filled project",
+            category="development",
+            status=StageStatus.ACCEPTED,
+            is_filled=False,
+        )
+
+        response = self.client.get(
+            reverse("api:stage-list"),
+            data={
+                "status": StageStatus.ACCEPTED,
+                "source_system_id": source_system_one.pk,
+                "category": "development",
+                "is_filled": "true",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(
+            [item["source_id"] for item in response.json()["results"]],
+            ["project-combined-match"],
+        )

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ideas.models import Stage
+from ideas.models import Stage, StageStatus
 
 
 class StageIngestionSerializer(serializers.ModelSerializer):
@@ -44,3 +44,26 @@ class StageListSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class StageListFilterSerializer(serializers.Serializer):
+    status = serializers.CharField(required=False)
+    source_system_id = serializers.IntegerField(required=False, min_value=1)
+    category = serializers.CharField(required=False)
+    is_filled = serializers.BooleanField(required=False)
+    include_rejected = serializers.BooleanField(required=False, default=False)
+
+    def validate_status(self, value):
+        statuses = [item.strip() for item in value.split(",") if item.strip()]
+        valid_statuses = {choice for choice, _ in StageStatus.choices}
+        invalid_statuses = [status for status in statuses if status not in valid_statuses]
+
+        if not statuses:
+            raise serializers.ValidationError("At least one status must be provided.")
+
+        if invalid_statuses:
+            raise serializers.ValidationError(
+                f"Unsupported status values: {', '.join(invalid_statuses)}"
+            )
+
+        return statuses
