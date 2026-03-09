@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils import timezone
 
 from ideas.models import Stage, StageStatus
 from ideas.serializers import (
@@ -169,7 +170,13 @@ class StageElaborationUpdateView(APIView):
         serializer.save()
         stage.refresh_from_db()
 
-        if not stage.is_filled and any(
+        if stage.is_filled:
+            if stage.filled_at is None:
+                stage.filled_at = timezone.localdate()
+            stage.status = StageStatus.COMPLETED
+            stage.save(update_fields=["status", "filled_at", "updated_at"])
+            stage.refresh_from_db()
+        elif any(
             getattr(stage, field) not in (None, "") for field in ELABORATION_FIELDS
         ):
             stage.status = StageStatus.IN_PROGRESS

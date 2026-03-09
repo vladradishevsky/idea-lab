@@ -905,9 +905,70 @@ class StageElaborationUpdateApiTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(stage.custom_title, "Already filled project")
-        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertEqual(stage.status, StageStatus.COMPLETED)
         self.assertTrue(stage.is_filled)
-        self.assertEqual(response.json()["status"], StageStatus.ACCEPTED)
+        self.assertIsNotNone(stage.filled_at)
+        self.assertEqual(response.json()["status"], StageStatus.COMPLETED)
+
+    def test_stage_elaboration_update_endpoint_sets_completed_and_filled_at(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Complete Elaboration API",
+            base_url="https://example.com",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-complete",
+            source_url="https://example.com/projects/elaboration-complete",
+            title="Completion target",
+            status=StageStatus.IN_PROGRESS,
+            is_filled=False,
+            custom_title="Ready for completion",
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={"is_filled": True},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(stage.is_filled)
+        self.assertEqual(stage.status, StageStatus.COMPLETED)
+        self.assertEqual(stage.filled_at, timezone.localdate())
+        self.assertEqual(response.json()["status"], StageStatus.COMPLETED)
+        self.assertEqual(response.json()["filled_at"], stage.filled_at.isoformat())
+
+    def test_stage_elaboration_update_endpoint_preserves_existing_filled_at(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Preserve FilledAt API",
+            base_url="https://example.com",
+        )
+        original_filled_at = timezone.localdate() - timezone.timedelta(days=3)
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-preserve-filled-at",
+            source_url="https://example.com/projects/elaboration-preserve-filled-at",
+            title="Preserve filled at target",
+            status=StageStatus.COMPLETED,
+            is_filled=True,
+            filled_at=original_filled_at,
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={"custom_description": "Refined after completion"},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.status, StageStatus.COMPLETED)
+        self.assertTrue(stage.is_filled)
+        self.assertEqual(stage.filled_at, original_filled_at)
+        self.assertEqual(response.json()["filled_at"], original_filled_at.isoformat())
 
     def test_stage_elaboration_update_endpoint_rejects_service_fields(self) -> None:
         source_system = SourceSystem.objects.create(
@@ -927,7 +988,7 @@ class StageElaborationUpdateApiTests(TestCase):
             data={
                 "custom_title": "Legit update",
                 "status": StageStatus.COMPLETED,
-                "is_filled": True,
+                "filled_at": timezone.localdate().isoformat(),
             },
             content_type="application/json",
         )
@@ -938,10 +999,11 @@ class StageElaborationUpdateApiTests(TestCase):
         self.assertIsNone(stage.custom_title)
         self.assertEqual(stage.status, StageStatus.ACCEPTED)
         self.assertFalse(stage.is_filled)
+        self.assertIsNone(stage.filled_at)
         self.assertEqual(
             response.json(),
             {
                 "status": ["This field is not allowed."],
-                "is_filled": ["This field is not allowed."],
+                "filled_at": ["This field is not allowed."],
             },
         )

@@ -123,4 +123,5 @@ class StageElaborationUpdateSerializer(serializers.ModelSerializer):
             "planned_feature",
             "implementation_ease_percent",
             "risks",
+            "is_filled",
         ]
