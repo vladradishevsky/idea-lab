@@ -662,3 +662,65 @@ class StageListApiTests(TestCase):
             [item["source_id"] for item in response.json()["results"]],
             ["project-combined-match"],
         )
+
+
+class StageDetailApiTests(TestCase):
+    def test_stage_detail_endpoint_returns_full_stage_card(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Kwork Detail API",
+            base_url="https://kwork.ru",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-detail-1",
+            source_url="https://kwork.ru/projects/detail-1",
+            title="Detailed project",
+            description="Detailed description",
+            category="development",
+            custom_title="Custom project title",
+            custom_description="Custom project description",
+            existing_solution="Spreadsheet plus manual work",
+            original_revenue_estimate="$500 MRR",
+            seo_query="idea validation software",
+            seo_kd_percent=42,
+            seo_popularity_vs_adblocker="Lower than adblocker, but steady",
+            planned_feature="Competitor snapshot",
+            implementation_ease_percent=67,
+            risks="Low search intent conversion",
+            status=StageStatus.ACCEPTED,
+            is_filled=True,
+            filled_at=timezone.localdate(),
+        )
+
+        response = self.client.get(
+            reverse("api:stage-detail", kwargs={"pk": stage.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "id": stage.pk,
+                "source_system_id": source_system.pk,
+                "source_id": "project-detail-1",
+                "source_url": "https://kwork.ru/projects/detail-1",
+                "title": "Detailed project",
+                "description": "Detailed description",
+                "category": "development",
+                "custom_title": "Custom project title",
+                "custom_description": "Custom project description",
+                "existing_solution": "Spreadsheet plus manual work",
+                "original_revenue_estimate": "$500 MRR",
+                "seo_query": "idea validation software",
+                "seo_kd_percent": 42,
+                "seo_popularity_vs_adblocker": "Lower than adblocker, but steady",
+                "planned_feature": "Competitor snapshot",
+                "implementation_ease_percent": 67,
+                "risks": "Low search intent conversion",
+                "status": StageStatus.ACCEPTED,
+                "is_filled": True,
+                "filled_at": stage.filled_at.isoformat(),
+                "created_at": stage.created_at.isoformat().replace("+00:00", "Z"),
+                "updated_at": stage.updated_at.isoformat().replace("+00:00", "Z"),
+            },
+        )

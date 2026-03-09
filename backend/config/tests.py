@@ -13,6 +13,7 @@ class ApiRootTests(SimpleTestCase):
                 "health": "http://testserver/api/health/",
                 "ingest": "http://testserver/api/ingest/",
                 "stages": "http://testserver/api/stages/",
+                "stage_detail": "http://testserver/api/stages/1/",
             },
         )
 

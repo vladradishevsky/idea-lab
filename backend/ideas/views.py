@@ -1,13 +1,14 @@
 import logging
 
 from rest_framework import exceptions, status
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ideas.models import Stage, StageStatus
 from ideas.serializers import (
+    StageDetailSerializer,
     StageIngestionSerializer,
     StageListFilterSerializer,
     StageListSerializer,
@@ -107,3 +108,10 @@ class StageListView(ListAPIView):
             queryset = queryset.filter(is_filled=is_filled)
 
         return queryset
+
+
+class StageDetailView(RetrieveAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = StageDetailSerializer
+    queryset = Stage.objects.select_related("source_system")

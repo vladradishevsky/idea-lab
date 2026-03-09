@@ -46,6 +46,37 @@ class StageListSerializer(serializers.ModelSerializer):
         ]
 
 
+class StageDetailSerializer(serializers.ModelSerializer):
+    source_system_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Stage
+        fields = [
+            "id",
+            "source_system_id",
+            "source_id",
+            "source_url",
+            "title",
+            "description",
+            "category",
+            "custom_title",
+            "custom_description",
+            "existing_solution",
+            "original_revenue_estimate",
+            "seo_query",
+            "seo_kd_percent",
+            "seo_popularity_vs_adblocker",
+            "planned_feature",
+            "implementation_ease_percent",
+            "risks",
+            "status",
+            "is_filled",
+            "filled_at",
+            "created_at",
+            "updated_at",
+        ]
+
+
 class StageListFilterSerializer(serializers.Serializer):
     status = serializers.CharField(required=False)
     source_system_id = serializers.IntegerField(required=False, min_value=1)
