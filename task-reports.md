@@ -570,7 +570,7 @@
 ## T30 — Собрать базовый layout и навигацию
 - Дата: 2026-03-09 20:21 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `56ad043`
 
 Что сделано:
 - в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) добавлен общий `AppLayout` с брендовым header-блоком и primary navigation;
