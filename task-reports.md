@@ -409,3 +409,22 @@
 Состояние запуска:
 - backend отдаёт пагинированный список идей с дефолтной сортировкой по времени создания;
 - проект остаётся запускаемым после задачи
+
+## T22 — Добавить фильтры списка идей
+- Дата: 2026-03-09 19:31 +0300
+- Статус: done
+- Коммит: `4ea8a56`
+
+Что сделано:
+- в [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) добавлен `StageListFilterSerializer` для валидации query params списка идей;
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) `StageListView` расширен фильтрами `status`, `source_system_id`, `category`, `is_filled` и `include_rejected`;
+- по умолчанию `/api/stages/` теперь скрывает записи со статусом `rejected`, но позволяет явно запрашивать их через `status=rejected` или `include_rejected=true`;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены backend-тесты на каждый обязательный фильтр и на их типовое сочетание.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`/api/stages/` вернул `14`, `/api/stages/?include_rejected=true` вернул `15`)
+
+Состояние запуска:
+- backend продолжает отдавать пагинированный список идей и теперь поддерживает обязательные фильтры из PRD;
+- проект остаётся запускаемым после задачи
