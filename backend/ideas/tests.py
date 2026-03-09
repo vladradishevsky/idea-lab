@@ -849,9 +849,64 @@ class StageElaborationUpdateApiTests(TestCase):
         self.assertEqual(stage.planned_feature, "Landing page generator")
         self.assertEqual(stage.implementation_ease_percent, 71)
         self.assertEqual(stage.risks, "Demand may be narrow")
-        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertEqual(stage.status, StageStatus.IN_PROGRESS)
         self.assertFalse(stage.is_filled)
         self.assertEqual(response.json()["custom_title"], "Validated niche title")
+        self.assertEqual(response.json()["status"], StageStatus.IN_PROGRESS)
+
+    def test_stage_elaboration_update_endpoint_moves_new_stage_to_in_progress(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="New To In Progress API",
+            base_url="https://example.com",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-new",
+            source_url="https://example.com/projects/elaboration-new",
+            title="New elaboration target",
+            status=StageStatus.NEW,
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={"existing_solution": "Manual analyst workflow"},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.existing_solution, "Manual analyst workflow")
+        self.assertEqual(stage.status, StageStatus.IN_PROGRESS)
+        self.assertFalse(stage.is_filled)
+        self.assertEqual(response.json()["status"], StageStatus.IN_PROGRESS)
+
+    def test_stage_elaboration_update_endpoint_keeps_completed_flag_out_of_scope(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Filled Elaboration API",
+            base_url="https://example.com",
+        )
+        stage = Stage.objects.create(
+            source_system=source_system,
+            source_id="project-elaboration-filled",
+            source_url="https://example.com/projects/elaboration-filled",
+            title="Filled elaboration target",
+            status=StageStatus.ACCEPTED,
+            is_filled=True,
+        )
+
+        response = self.client.patch(
+            reverse("api:stage-elaboration-update", kwargs={"pk": stage.pk}),
+            data={"custom_title": "Already filled project"},
+            content_type="application/json",
+        )
+
+        stage.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(stage.custom_title, "Already filled project")
+        self.assertEqual(stage.status, StageStatus.ACCEPTED)
+        self.assertTrue(stage.is_filled)
         self.assertEqual(response.json()["status"], StageStatus.ACCEPTED)
 
     def test_stage_elaboration_update_endpoint_rejects_service_fields(self) -> None:

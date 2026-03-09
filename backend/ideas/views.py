@@ -19,6 +19,8 @@ from ideas.serializers import (
 
 logger = logging.getLogger("ideas.ingest")
 
+ELABORATION_FIELDS = tuple(StageElaborationUpdateSerializer.Meta.fields)
+
 
 class StagePagination(PageNumberPagination):
     page_size = 20
@@ -166,5 +168,12 @@ class StageElaborationUpdateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         stage.refresh_from_db()
+
+        if not stage.is_filled and any(
+            getattr(stage, field) not in (None, "") for field in ELABORATION_FIELDS
+        ):
+            stage.status = StageStatus.IN_PROGRESS
+            stage.save(update_fields=["status", "updated_at"])
+            stage.refresh_from_db()
 
         return Response(StageDetailSerializer(stage).data, status=status.HTTP_200_OK)
