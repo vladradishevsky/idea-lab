@@ -526,3 +526,22 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь поддерживает полный переход в `completed` через ручную установку `is_filled=true`;
 - проект остаётся запускаемым после задачи
+
+## T28 — Реализовать dashboard aggregates endpoint
+- Дата: 2026-03-09 20:00 +0300
+- Статус: done
+- Коммит: `718c906`
+
+Что сделано:
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлен `StageDashboardAggregatesView`, который считает количество идей по всем статусам из PRD;
+- endpoint возвращает стабильный JSON с ключами `new`, `accepted`, `rejected`, `in_progress`, `completed`, даже когда часть значений равна нулю;
+- в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py) подключён маршрут `/api/dashboard/aggregates/`, а [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) и [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) обновлены под новый endpoint;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлен backend-тест, который проверяет точные counts по статусам.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`GET /api/dashboard/aggregates/` вернул агрегаты со статусами `new`, `accepted`, `rejected`, `in_progress`, `completed`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь умеет отдавать агрегаты для dashboard;
+- проект остаётся запускаемым после задачи
