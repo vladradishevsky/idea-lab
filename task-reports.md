@@ -448,3 +448,23 @@
 Состояние запуска:
 - backend продолжает подниматься в compose-окружении и теперь умеет отдавать полную карточку одной идеи;
 - проект остаётся запускаемым после задачи
+
+## T24 — Реализовать action быстрой смены статуса `accepted/rejected`
+- Дата: 2026-03-09 19:50 +0300
+- Статус: done
+- Коммит: `2104c0f`
+
+Что сделано:
+- в [`backend/ideas/serializers.py`](/home/vr/projects/idea-lab/backend/ideas/serializers.py) добавлен `StageStatusUpdateSerializer`, который принимает только `accepted` и `rejected`;
+- в [`backend/ideas/views.py`](/home/vr/projects/idea-lab/backend/ideas/views.py) добавлен `StageStatusUpdateView` для quick filter action;
+- action разрешает быстрый перевод только для идей со статусом `new`, а недопустимые переходы возвращают `400`;
+- в [`backend/config/api_urls.py`](/home/vr/projects/idea-lab/backend/config/api_urls.py) подключён маршрут `/api/stages/<id>/status/`, а [`backend/config/views.py`](/home/vr/projects/idea-lab/backend/config/views.py) и [`backend/config/tests.py`](/home/vr/projects/idea-lab/backend/config/tests.py) обновлены под новый endpoint;
+- в [`backend/ideas/tests.py`](/home/vr/projects/idea-lab/backend/ideas/tests.py) добавлены backend-тесты на `new -> accepted`, `new -> rejected` и отклонение недопустимого перехода.
+
+Проверка:
+- `docker compose exec -T web python manage.py test` — passed
+- `docker compose exec -T web python manage.py shell -c "..."` — passed (`POST /api/stages/<id>/status/` вернул `200` и статус `accepted`)
+
+Состояние запуска:
+- backend продолжает подниматься в compose-окружении и теперь поддерживает quick filter action для смены статуса;
+- проект остаётся запускаемым после задачи
