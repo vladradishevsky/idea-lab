@@ -11,6 +11,7 @@ class ApiRootTests(SimpleTestCase):
             response.json(),
             {
                 "health": "http://testserver/api/health/",
+                "source_systems": "http://testserver/api/source-systems/",
                 "dashboard_aggregates": "http://testserver/api/dashboard/aggregates/",
                 "ingest": "http://testserver/api/ingest/",
                 "stages": "http://testserver/api/stages/",

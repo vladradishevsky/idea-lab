@@ -1,6 +1,17 @@
 from rest_framework import serializers
 
-from ideas.models import Stage, StageStatus
+from ideas.models import SourceSystem, Stage, StageStatus
+
+
+class SourceSystemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SourceSystem
+        fields = [
+            "id",
+            "name",
+            "base_url",
+            "is_active",
+        ]
 
 
 class StageIngestionSerializer(serializers.ModelSerializer):

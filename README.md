@@ -93,6 +93,31 @@ docker compose exec -T web python manage.py test
 }
 ```
 
+### Source systems
+- `GET /api/source-systems/`
+- Возвращает активные источники для фильтра по источнику на frontend.
+- Список не пагинируется.
+- Элементы отсортированы по `name`.
+
+Пример ответа:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Kwork",
+    "base_url": "https://kwork.ru/projects",
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "name": "Freelance.ru",
+    "base_url": "https://freelance.ru/project/search?q=&a=0&a=1&v=0&v=1&c=&c%5B%5D=116&c%5B%5D=724&c%5B%5D=4",
+    "is_active": true
+  }
+]
+```
+
 ### Ingestion
 - `POST /api/ingest/`
 - Принимает один объект или массив объектов.
@@ -162,7 +187,33 @@ docker compose exec -T web python manage.py test
 GET /api/stages/?status=accepted,in_progress&source_system_id=1&is_filled=false
 ```
 
-Формат элемента списка:
+Формат ответа:
+
+```json
+{
+  "count": 124,
+  "next": "http://localhost:8000/api/stages/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "source_system_id": 1,
+      "source_id": "project-123",
+      "source_url": "https://kwork.ru/projects/123",
+      "title": "Build an MVP",
+      "description": "Need a small product team",
+      "category": "development",
+      "status": "accepted",
+      "is_filled": false,
+      "filled_at": null,
+      "created_at": "2026-03-09T10:00:00Z",
+      "updated_at": "2026-03-09T10:00:00Z"
+    }
+  ]
+}
+```
+
+Формат элемента `results`:
 
 ```json
 {
@@ -201,6 +252,16 @@ GET /api/stages/?status=accepted,in_progress&source_system_id=1&is_filled=false
 }
 ```
 
+Пример ошибки:
+
+```json
+{
+  "status": [
+    "Quick status update is only available for stages in 'new' status."
+  ]
+}
+```
+
 ### Elaboration update
 - `PATCH /api/stages/<id>/elaboration/`
 - Используется для редактирования карточки проработки.
@@ -233,6 +294,18 @@ GET /api/stages/?status=accepted,in_progress&source_system_id=1&is_filled=false
   "is_filled": true
 }
 ```
+
+Пример ошибки:
+
+```json
+{
+  "status": ["This field is not allowed."],
+  "filled_at": ["This field is not allowed."]
+}
+```
+
+Общий случай для `GET /api/stages/<id>/`, `POST /api/stages/<id>/status/` и `PATCH /api/stages/<id>/elaboration/`:
+- `404` возвращается, если записи с таким `id` не существует.
 
 Ответом для `GET /api/stages/<id>/`, `POST /api/stages/<id>/status/` и `PATCH /api/stages/<id>/elaboration/` служит полная карточка идеи:
 

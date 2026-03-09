@@ -8,6 +8,7 @@ class ApiRootView(APIView):
         return Response(
             {
                 "health": reverse("api:health-check", request=request),
+                "source_systems": reverse("api:source-system-list", request=request),
                 "dashboard_aggregates": reverse("api:dashboard-aggregates", request=request),
                 "ingest": reverse("api:ingest", request=request),
                 "stages": reverse("api:stage-list", request=request),

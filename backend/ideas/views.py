@@ -8,8 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
 
-from ideas.models import Stage, StageStatus
+from ideas.models import SourceSystem, Stage, StageStatus
 from ideas.serializers import (
+    SourceSystemSerializer,
     StageElaborationUpdateSerializer,
     StageDetailSerializer,
     StageIngestionSerializer,
@@ -114,6 +115,14 @@ class StageListView(ListAPIView):
             queryset = queryset.filter(is_filled=is_filled)
 
         return queryset
+
+
+class SourceSystemListView(ListAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = SourceSystemSerializer
+    queryset = SourceSystem.objects.filter(is_active=True).order_by("name", "id")
+    pagination_class = None
 
 
 class StageDashboardAggregatesView(APIView):

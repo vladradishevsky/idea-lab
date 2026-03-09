@@ -47,6 +47,64 @@ class SourceSystemModelTests(TestCase):
         self.assertEqual(actual_sources, expected_sources)
 
 
+class SourceSystemApiTests(TestCase):
+    def test_source_system_list_returns_active_sources_sorted_by_name(self) -> None:
+        SourceSystem.objects.create(
+            name="Zulu Source",
+            base_url="https://zulu.example.com",
+            is_active=True,
+        )
+        SourceSystem.objects.create(
+            name="Alpha Source",
+            base_url="https://alpha.example.com",
+            is_active=True,
+        )
+        SourceSystem.objects.create(
+            name="Hidden Source",
+            base_url="https://hidden.example.com",
+            is_active=False,
+        )
+
+        response = self.client.get(reverse("api:source-system-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "id": SourceSystem.objects.get(name="Alpha Source").pk,
+                    "name": "Alpha Source",
+                    "base_url": "https://alpha.example.com",
+                    "is_active": True,
+                },
+                {
+                    "id": SourceSystem.objects.get(name="FL.ru").pk,
+                    "name": "FL.ru",
+                    "base_url": "https://www.fl.ru/projects/category/programmirovanie//",
+                    "is_active": True,
+                },
+                {
+                    "id": SourceSystem.objects.get(name="Freelance.ru").pk,
+                    "name": "Freelance.ru",
+                    "base_url": "https://freelance.ru/project/search?q=&a=0&a=1&v=0&v=1&c=&c%5B%5D=116&c%5B%5D=724&c%5B%5D=4",
+                    "is_active": True,
+                },
+                {
+                    "id": SourceSystem.objects.get(name="Kwork").pk,
+                    "name": "Kwork",
+                    "base_url": "https://kwork.ru/projects",
+                    "is_active": True,
+                },
+                {
+                    "id": SourceSystem.objects.get(name="Zulu Source").pk,
+                    "name": "Zulu Source",
+                    "base_url": "https://zulu.example.com",
+                    "is_active": True,
+                },
+            ],
+        )
+
+
 class StageModelTests(TestCase):
     def test_stage_uses_new_status_by_default(self) -> None:
         source_system = SourceSystem.objects.create(
