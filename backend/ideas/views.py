@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Count, Q
 from rest_framework import exceptions, status
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -113,6 +114,22 @@ class StageListView(ListAPIView):
             queryset = queryset.filter(is_filled=is_filled)
 
         return queryset
+
+
+class StageDashboardAggregatesView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        aggregates = Stage.objects.aggregate(
+            new=Count("id", filter=Q(status=StageStatus.NEW)),
+            accepted=Count("id", filter=Q(status=StageStatus.ACCEPTED)),
+            rejected=Count("id", filter=Q(status=StageStatus.REJECTED)),
+            in_progress=Count("id", filter=Q(status=StageStatus.IN_PROGRESS)),
+            completed=Count("id", filter=Q(status=StageStatus.COMPLETED)),
+        )
+
+        return Response(aggregates)
 
 
 class StageDetailView(RetrieveAPIView):

@@ -1007,3 +1007,70 @@ class StageElaborationUpdateApiTests(TestCase):
                 "filled_at": ["This field is not allowed."],
             },
         )
+
+
+class StageDashboardAggregatesApiTests(TestCase):
+    def test_dashboard_aggregates_endpoint_returns_counts_by_status(self) -> None:
+        source_system = SourceSystem.objects.create(
+            name="Dashboard Aggregates API",
+            base_url="https://example.com",
+        )
+
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-new",
+            source_url="https://example.com/dashboard-new",
+            title="New dashboard project",
+            status=StageStatus.NEW,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-accepted",
+            source_url="https://example.com/dashboard-accepted",
+            title="Accepted dashboard project",
+            status=StageStatus.ACCEPTED,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-rejected",
+            source_url="https://example.com/dashboard-rejected",
+            title="Rejected dashboard project",
+            status=StageStatus.REJECTED,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-in-progress-1",
+            source_url="https://example.com/dashboard-in-progress-1",
+            title="In progress dashboard project 1",
+            status=StageStatus.IN_PROGRESS,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-in-progress-2",
+            source_url="https://example.com/dashboard-in-progress-2",
+            title="In progress dashboard project 2",
+            status=StageStatus.IN_PROGRESS,
+        )
+        Stage.objects.create(
+            source_system=source_system,
+            source_id="dashboard-completed",
+            source_url="https://example.com/dashboard-completed",
+            title="Completed dashboard project",
+            status=StageStatus.COMPLETED,
+            is_filled=True,
+            filled_at=timezone.localdate(),
+        )
+
+        response = self.client.get(reverse("api:dashboard-aggregates"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "new": 1,
+                "accepted": 1,
+                "rejected": 1,
+                "in_progress": 2,
+                "completed": 1,
+            },
+        )
