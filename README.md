@@ -8,6 +8,10 @@
 - database: PostgreSQL
 - local infrastructure: Docker Compose
 
+Язык интерфейса первой версии:
+- пользовательский frontend UI должен быть выполнен на русском языке;
+- английский сохраняется только в API-контрактах, технических терминах, коде и URL.
+
 ## Структура проекта
 - `backend/` — Django backend
 - `frontend/` — React frontend

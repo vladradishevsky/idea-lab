@@ -9,35 +9,35 @@ import { useApiRequest } from "./hooks/useApiRequest";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api (same-origin proxy)";
 const dashboardStatuses = [
-  { key: "new", label: "New", accentClass: "status-accent-new" },
-  { key: "accepted", label: "Accepted", accentClass: "status-accent-accepted" },
-  { key: "in_progress", label: "In Progress", accentClass: "status-accent-progress" },
-  { key: "completed", label: "Completed", accentClass: "status-accent-completed" },
-  { key: "rejected", label: "Rejected", accentClass: "status-accent-rejected" },
+  { key: "new", label: "Новые", accentClass: "status-accent-new" },
+  { key: "accepted", label: "Принятые", accentClass: "status-accent-accepted" },
+  { key: "in_progress", label: "В работе", accentClass: "status-accent-progress" },
+  { key: "completed", label: "Завершённые", accentClass: "status-accent-completed" },
+  { key: "rejected", label: "Отклонённые", accentClass: "status-accent-rejected" },
 ];
 
 const pages = [
   {
     path: "/",
-    navLabel: "Dashboard",
-    eyebrow: "Dashboard Route",
-    title: "Idea pipeline overview will live here",
+    navLabel: "Дашборд",
+    eyebrow: "Главная страница",
+    title: "Обзор воронки идей будет здесь",
     description:
-      "The dashboard route is ready. Next tasks will add aggregates, progress indicators, and navigation into the two working flows.",
+      "Маршрут главной страницы готов. Следующие задачи будут развивать агрегаты, визуализацию прогресса и рабочую навигацию по двум основным сценариям.",
   },
   {
     path: "/filter",
-    navLabel: "Quick Filter",
-    eyebrow: "Quick Filter Route",
-    title: "Primary idea screening starts on this page",
+    navLabel: "Фильтрация",
+    eyebrow: "Быстрая фильтрация",
+    title: "Первичный отбор идей начинается на этой странице",
     description:
-      "The quick filter route is wired and ready for the upcoming card workflow with accept and reject actions.",
-    summaryTitle: "Backend health preview",
+      "Маршрут быстрой фильтрации подключён и готов к следующему шагу: карточки идей с действиями принятия и отклонения.",
+    summaryTitle: "Проверка состояния backend",
     requestFactory: getHealthStatus,
     renderData(data) {
       return (
         <div className="summary-stack">
-          <p className="summary-kicker">Service status</p>
+          <p className="summary-kicker">Состояние сервиса</p>
           <p className="summary-value">{data.status}</p>
         </div>
       );
@@ -45,12 +45,12 @@ const pages = [
   },
   {
     path: "/stages",
-    navLabel: "Elaboration",
-    eyebrow: "Elaboration Route",
-    title: "Detailed stage review will be built here",
+    navLabel: "Проработка",
+    eyebrow: "Детальная проработка",
+    title: "Подробная работа с идеями будет собрана здесь",
     description:
-      "The elaboration route is ready for the next tasks that will add the list view, filters, and the editing form.",
-    summaryTitle: "Available source systems",
+      "Маршрут проработки готов для следующих задач: список идей, фильтры и форма редактирования карточки.",
+    summaryTitle: "Доступные источники",
     requestFactory: getSourceSystems,
     renderData(data) {
       return (
@@ -74,9 +74,9 @@ function AppLayout({ children }) {
         <div className="brand-block">
           <p className="brand-kicker">Idea Lab</p>
           <div>
-            <h2 className="brand-title">Business idea review cockpit</h2>
+            <h2 className="brand-title">Панель оценки бизнес-идей</h2>
             <p className="brand-subtitle">
-              Navigate the workflow from dashboard to screening and detailed elaboration.
+              Переходи между дашбордом, первичной фильтрацией и детальной проработкой.
             </p>
           </div>
         </div>
@@ -116,30 +116,29 @@ function DashboardPage() {
     <main className="page-content">
       <section className="dashboard-hero">
         <div className="dashboard-copy">
-          <p className="eyebrow">Dashboard</p>
-          <h1>Idea funnel at a glance</h1>
+          <p className="eyebrow">Дашборд</p>
+          <h1>Воронка идей одним взглядом</h1>
           <p className="body">
-            Track the full flow from raw opportunities to completed evaluations, then jump
-            straight into the next action.
+            Следи за полным потоком: от новых возможностей до завершённых карточек, а потом сразу переходи к следующему действию.
           </p>
           <div className="cta-row">
             <Link className="primary-link" to="/filter">
-              Start quick filter
+              Начать фильтрацию
             </Link>
             <Link className="secondary-link" to="/stages">
-              Open elaboration workspace
+              Открыть проработку
             </Link>
           </div>
         </div>
         <aside className="dashboard-side">
           <div className="spotlight-card">
-            <p className="spotlight-label">API base</p>
+            <p className="spotlight-label">Базовый адрес API</p>
             <p className="spotlight-value">{apiBaseUrl}</p>
           </div>
           <div className="spotlight-card">
-            <p className="spotlight-label">Pipeline focus</p>
+            <p className="spotlight-label">Фокус работы</p>
             <p className="spotlight-copy">
-              Prioritize accepted ideas and push in-progress research toward completion.
+              Доводи принятые идеи до результата и вытягивай карточки в работе к завершению.
             </p>
           </div>
         </aside>
@@ -148,26 +147,26 @@ function DashboardPage() {
       <section className="summary-card">
         <div className="summary-header">
           <div>
-            <p className="summary-label">Live aggregates</p>
-            <h3 className="summary-title">Funnel overview</h3>
+            <p className="summary-label">Живые агрегаты</p>
+            <h3 className="summary-title">Сводка по воронке</h3>
           </div>
           <button className="ghost-button" type="button" onClick={reload}>
-            Reload
+            Обновить
           </button>
         </div>
 
         {isLoading ? (
           <div className="request-state request-state-loading">
-            <p className="request-state-title">Loading dashboard aggregates</p>
+            <p className="request-state-title">Загружаем агрегаты дашборда</p>
             <p className="request-state-copy">
-              Waiting for the backend summary from `/api/dashboard/aggregates/`.
+              Ждём сводку от backend по `/api/dashboard/aggregates/`.
             </p>
           </div>
         ) : null}
 
         {!isLoading && error ? (
           <div className="request-state request-state-error">
-            <p className="request-state-title">Dashboard request failed</p>
+            <p className="request-state-title">Не удалось загрузить дашборд</p>
             <p className="request-state-copy">{error.message}</p>
           </div>
         ) : null}
@@ -176,15 +175,15 @@ function DashboardPage() {
           <>
             <div className="metric-grid">
               <article className="metric-card">
-                <p className="metric-label">Total ideas</p>
+                <p className="metric-label">Всего идей</p>
                 <p className="metric-value">{totals.total}</p>
               </article>
               <article className="metric-card">
-                <p className="metric-label">Active pipeline</p>
+                <p className="metric-label">Активный поток</p>
                 <p className="metric-value">{totals.active}</p>
               </article>
               <article className="metric-card">
-                <p className="metric-label">Completion rate</p>
+                <p className="metric-label">Доля завершённых</p>
                 <p className="metric-value">{totals.completedRate}%</p>
               </article>
             </div>
@@ -207,32 +206,30 @@ function DashboardPage() {
       <section className="summary-card">
         <div className="summary-header">
           <div>
-            <p className="summary-label">Workflow entry points</p>
-            <h3 className="summary-title">Choose the next move</h3>
+            <p className="summary-label">Точки входа</p>
+            <h3 className="summary-title">Выбери следующий шаг</h3>
           </div>
         </div>
         <div className="workflow-grid">
           <Link className="workflow-card" to="/filter">
-            <span className="workflow-kicker">Quick Filter</span>
-            <strong className="workflow-title">Sort new ideas fast</strong>
+            <span className="workflow-kicker">Быстрая фильтрация</span>
+            <strong className="workflow-title">Быстро разобрать новые идеи</strong>
             <span className="workflow-copy">
-              Review incoming ideas one by one and decide whether each item is worth
-              keeping.
+              Просматривай входящие идеи по одной и сразу решай, стоит ли оставлять каждую в работе.
             </span>
           </Link>
           <Link className="workflow-card" to="/stages">
-            <span className="workflow-kicker">Elaboration</span>
-            <strong className="workflow-title">Deepen promising ideas</strong>
+            <span className="workflow-kicker">Проработка</span>
+            <strong className="workflow-title">Углубить перспективные идеи</strong>
             <span className="workflow-copy">
-              Move into detailed research, SEO validation, implementation planning, and
-              completion.
+              Переходи к исследованию, SEO-проверке, планированию реализации и завершению карточки.
             </span>
           </Link>
         </div>
       </section>
 
       <RequestSummary
-        summaryTitle="API discovery"
+        summaryTitle="Обзор API"
         requestFactory={getApiRoot}
         renderData={(data) => (
           <ul className="data-list">
@@ -256,26 +253,26 @@ function RequestSummary({ summaryTitle, requestFactory, renderData }) {
     <section className="summary-card">
       <div className="summary-header">
         <div>
-          <p className="summary-label">Backend preview</p>
+          <p className="summary-label">Данные backend</p>
           <h3 className="summary-title">{summaryTitle}</h3>
         </div>
         <button className="ghost-button" type="button" onClick={reload}>
-          Reload
+          Обновить
         </button>
       </div>
 
       {isLoading ? (
         <div className="request-state request-state-loading">
-          <p className="request-state-title">Loading data from API</p>
+          <p className="request-state-title">Загружаем данные из API</p>
           <p className="request-state-copy">
-            Waiting for the backend response through the shared request hook.
+            Ждём ответ backend через общий request hook.
           </p>
         </div>
       ) : null}
 
       {!isLoading && error ? (
         <div className="request-state request-state-error">
-          <p className="request-state-title">Request failed</p>
+          <p className="request-state-title">Запрос завершился ошибкой</p>
           <p className="request-state-copy">{error.message}</p>
         </div>
       ) : null}
@@ -298,15 +295,15 @@ function RoutePage({ eyebrow, title, description, summaryTitle, requestFactory, 
         </div>
         <dl className="status-list">
           <div className="status-item">
-            <dt>Current route</dt>
+            <dt>Текущий маршрут</dt>
             <dd>{location.pathname}</dd>
           </div>
           <div className="status-item">
-            <dt>Frontend status</dt>
-            <dd>Shared layout and primary navigation are now enabled</dd>
+            <dt>Состояние frontend</dt>
+            <dd>Общий layout и основная навигация уже подключены</dd>
           </div>
           <div className="status-item">
-            <dt>Backend API base URL</dt>
+            <dt>Базовый адрес backend API</dt>
             <dd>{apiBaseUrl}</dd>
           </div>
         </dl>
