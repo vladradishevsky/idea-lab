@@ -3,6 +3,7 @@ import {
   getApiRoot,
   getDashboardAggregates,
   getHealthStatus,
+  getNextQuickFilterStage,
   getSourceSystems,
 } from "./api/resources";
 import { useApiRequest } from "./hooks/useApiRequest";
@@ -246,6 +247,127 @@ function DashboardPage() {
   );
 }
 
+function QuickFilterPage() {
+  const { data, error, isLoading, reload } = useApiRequest(getNextQuickFilterStage, []);
+  const nextStage = data?.results?.[0] ?? null;
+
+  return (
+    <main className="page-content">
+      <section className="hero-card">
+        <div className="hero-copy">
+          <p className="eyebrow">Быстрая фильтрация</p>
+          <h1>Следующая идея для первичной оценки</h1>
+          <p className="body">
+            Страница уже подключена к списку идей и по умолчанию подбирает первую
+            доступную карточку без отклонённых записей.
+          </p>
+        </div>
+        <dl className="status-list">
+          <div className="status-item">
+            <dt>Источник данных</dt>
+            <dd>GET /api/stages/?page_size=1</dd>
+          </div>
+          <div className="status-item">
+            <dt>Правило по умолчанию</dt>
+            <dd>Отклонённые идеи скрыты до отдельного фильтра из следующих задач</dd>
+          </div>
+          <div className="status-item">
+            <dt>Базовый адрес backend API</dt>
+            <dd>{apiBaseUrl}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="summary-card">
+        <div className="summary-header">
+          <div>
+            <p className="summary-label">Следующая карточка</p>
+            <h3 className="summary-title">Предпросмотр идеи для фильтрации</h3>
+          </div>
+          <button className="ghost-button" type="button" onClick={reload}>
+            Обновить
+          </button>
+        </div>
+
+        {isLoading ? (
+          <div className="request-state request-state-loading">
+            <p className="request-state-title">Загружаем следующую идею</p>
+            <p className="request-state-copy">
+              Получаем первую доступную запись из списка stages для сценария быстрой
+              фильтрации.
+            </p>
+          </div>
+        ) : null}
+
+        {!isLoading && error ? (
+          <div className="request-state request-state-error">
+            <p className="request-state-title">Не удалось получить идею</p>
+            <p className="request-state-copy">{error.message}</p>
+          </div>
+        ) : null}
+
+        {!isLoading && !error && nextStage ? (
+          <article className="quick-filter-card">
+            <div className="quick-filter-header">
+              <div>
+                <p className="summary-kicker">Статус</p>
+                <p className="quick-filter-status">{nextStage.status}</p>
+              </div>
+              <div className="quick-filter-meta">
+                <span>ID #{nextStage.id}</span>
+                <span>Источник #{nextStage.source_system_id}</span>
+              </div>
+            </div>
+            <h2 className="quick-filter-title">{nextStage.title}</h2>
+            <p className="quick-filter-description">
+              {nextStage.description || "Описание пока не заполнено во входящих данных."}
+            </p>
+            <dl className="quick-filter-details">
+              <div className="quick-filter-detail">
+                <dt>Категория</dt>
+                <dd>{nextStage.category || "Не указана"}</dd>
+              </div>
+              <div className="quick-filter-detail">
+                <dt>Ссылка на источник</dt>
+                <dd>
+                  <a
+                    className="inline-link"
+                    href={nextStage.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {nextStage.source_url}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </article>
+        ) : null}
+
+        {!isLoading && !error && !nextStage ? (
+          <div className="request-state request-state-loading">
+            <p className="request-state-title">Идей для фильтрации пока нет</p>
+            <p className="request-state-copy">
+              Backend не вернул ни одной записи по текущему условию выборки.
+            </p>
+          </div>
+        ) : null}
+      </section>
+
+      <RequestSummary
+        summaryTitle="Проверка состояния backend"
+        requestFactory={getHealthStatus}
+        renderData={(data) => (
+          <div className="summary-stack">
+            <p className="summary-kicker">Состояние сервиса</p>
+            <p className="summary-value">{data.status}</p>
+          </div>
+        )}
+      />
+    </main>
+  );
+}
+
 function RequestSummary({ summaryTitle, requestFactory, renderData }) {
   const { data, error, isLoading, reload } = useApiRequest(requestFactory, []);
 
@@ -322,7 +444,8 @@ export default function App() {
     <AppLayout>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
-        {pages.filter((page) => page.path !== "/").map((page) => (
+        <Route path="/filter" element={<QuickFilterPage />} />
+        {pages.filter((page) => !["/", "/filter"].includes(page.path)).map((page) => (
           <Route
             key={page.path}
             path={page.path}

@@ -630,3 +630,24 @@
 Состояние запуска:
 - frontend продолжает подниматься в compose-окружении и теперь имеет рабочую dashboard-страницу на реальных backend-агрегатах;
 - проект остаётся запускаемым после задачи
+
+## T33 — Реализовать frontend-запрос на получение следующей идеи для фильтрации
+- Дата: 2026-03-09 20:41 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`frontend/src/api/resources.js`](/home/vr/projects/idea-lab/frontend/src/api/resources.js) добавлены `getStages` и `getNextQuickFilterStage` для выборки списка идей и первой карточки для quick filter;
+- в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) маршрут `/filter` переведён с заглушки на реальный `QuickFilterPage`, который загружает первую запись через `/api/stages/?page_size=1`;
+- quick filter page теперь показывает loading/error/empty состояния и превью следующей идеи с `title`, `description`, `category`, `source_url`, `status` и базовыми метаданными;
+- в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css) добавлены стили для карточки quick filter и связанных информационных блоков.
+
+Проверка:
+- `docker compose exec -T frontend wget -q -O - 'http://127.0.0.1:5173/api/stages/?page_size=1'` — passed (backend вернул первую карточку списка без `rejected` по умолчанию)
+- Playwright smoke-check `http://127.0.0.1:5173/filter` — passed (страница показывает карточку `Smoke ingest title`, совпадающую с ответом `/api/stages/?page_size=1`)
+- `docker compose logs frontend --tail 80` — passed
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- frontend продолжает подниматься в compose-окружении и теперь получает следующую идею для quick filter из реального backend API;
+- проект остаётся запускаемым после задачи
