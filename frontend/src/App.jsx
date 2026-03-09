@@ -1,10 +1,11 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "not configured";
 
 const pages = [
   {
     path: "/",
+    navLabel: "Dashboard",
     eyebrow: "Dashboard Route",
     title: "Idea pipeline overview will live here",
     description:
@@ -12,6 +13,7 @@ const pages = [
   },
   {
     path: "/filter",
+    navLabel: "Quick Filter",
     eyebrow: "Quick Filter Route",
     title: "Primary idea screening starts on this page",
     description:
@@ -19,6 +21,7 @@ const pages = [
   },
   {
     path: "/stages",
+    navLabel: "Elaboration",
     eyebrow: "Elaboration Route",
     title: "Detailed stage review will be built here",
     description:
@@ -26,11 +29,42 @@ const pages = [
   },
 ];
 
+function AppLayout({ children }) {
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="brand-block">
+          <p className="brand-kicker">Idea Lab</p>
+          <div>
+            <h2 className="brand-title">Business idea review cockpit</h2>
+            <p className="brand-subtitle">
+              Navigate the workflow from dashboard to screening and detailed elaboration.
+            </p>
+          </div>
+        </div>
+        <nav className="app-nav" aria-label="Primary">
+          {pages.map((page) => (
+            <NavLink
+              key={page.path}
+              to={page.path}
+              className={({ isActive }) => (isActive ? "nav-link is-active" : "nav-link")}
+              end={page.path === "/"}
+            >
+              {page.navLabel}
+            </NavLink>
+          ))}
+        </nav>
+      </header>
+      {children}
+    </div>
+  );
+}
+
 function RoutePage({ eyebrow, title, description }) {
   const location = useLocation();
 
   return (
-    <main className="app-shell">
+    <main className="page-content">
       <section className="hero-card">
         <div className="hero-copy">
           <p className="eyebrow">{eyebrow}</p>
@@ -44,7 +78,7 @@ function RoutePage({ eyebrow, title, description }) {
           </div>
           <div className="status-item">
             <dt>Frontend status</dt>
-            <dd>Routing is enabled and the page is rendered through React Router</dd>
+            <dd>Shared layout and primary navigation are now enabled</dd>
           </div>
           <div className="status-item">
             <dt>Backend API base URL</dt>
@@ -58,20 +92,22 @@ function RoutePage({ eyebrow, title, description }) {
 
 export default function App() {
   return (
-    <Routes>
-      {pages.map((page) => (
-        <Route
-          key={page.path}
-          path={page.path}
-          element={
-            <RoutePage
-              eyebrow={page.eyebrow}
-              title={page.title}
-              description={page.description}
-            />
-          }
-        />
-      ))}
-    </Routes>
+    <AppLayout>
+      <Routes>
+        {pages.map((page) => (
+          <Route
+            key={page.path}
+            path={page.path}
+            element={
+              <RoutePage
+                eyebrow={page.eyebrow}
+                title={page.title}
+                description={page.description}
+              />
+            }
+          />
+        ))}
+      </Routes>
+    </AppLayout>
   );
 }

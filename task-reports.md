@@ -566,3 +566,23 @@
 Состояние запуска:
 - frontend продолжает подниматься в compose-окружении и теперь поддерживает базовые клиентские маршруты для dashboard, quick filter и elaboration;
 - проект остаётся запускаемым после задачи
+
+## T30 — Собрать базовый layout и навигацию
+- Дата: 2026-03-09 20:21 +0300
+- Статус: done
+- Коммит: `uncommitted`
+
+Что сделано:
+- в [`frontend/src/App.jsx`](/home/vr/projects/idea-lab/frontend/src/App.jsx) добавлен общий `AppLayout` с брендовым header-блоком и primary navigation;
+- маршруты `/`, `/filter`, `/stages` переведены на единый shell, а навигация собрана на `NavLink` с активным состоянием для текущей страницы;
+- в [`frontend/src/styles.css`](/home/vr/projects/idea-lab/frontend/src/styles.css) добавлены стили header, pills-навигации, общего page layout и адаптивного поведения для узких экранов.
+
+Проверка:
+- `docker compose logs frontend --tail 60` — passed (Vite dev server продолжает работать после обновления layout)
+- Playwright smoke-check `http://127.0.0.1:5173/` — passed (в шапке рендерятся ссылки `Dashboard`, `Quick Filter`, `Elaboration`)
+- Playwright navigation click-check `/ -> /filter -> /stages -> /` — passed (клики по nav-ссылкам меняют URL, контент страницы и активную ссылку)
+- `docker compose ps` — passed (`db`, `web`, `frontend` в состоянии `healthy`)
+
+Состояние запуска:
+- frontend продолжает подниматься в compose-окружении и теперь имеет общий layout и рабочую навигацию между тремя основными разделами;
+- проект остаётся запускаемым после задачи
