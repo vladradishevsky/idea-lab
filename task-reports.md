@@ -549,7 +549,7 @@
 ## T29 — Настроить frontend routing
 - Дата: 2026-03-09 20:18 +0300
 - Статус: done
-- Коммит: `uncommitted`
+- Коммит: `7c43b10`
 
 Что сделано:
 - в [`frontend/package.json`](/home/vr/projects/idea-lab/frontend/package.json) и lockfile добавлена зависимость `react-router-dom` для клиентского роутинга;
